@@ -17,6 +17,14 @@ enum EMovementDirection
 	Down UMETA(DisplayName = "Down")
 };
 
+UENUM(BlueprintType)
+enum EEnemyMovementMode
+{
+	Normal UMETA(DisplayName = "Normal"),
+	Freezed UMETA(DisplayName = "Freeze")
+};
+
+
 UCLASS()
 class SPACEINVADERS_API AEnemySpawner : public AActor
 {
@@ -66,14 +74,29 @@ protected:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
-		float BaseMovennetSpeedSecond = 1.f;
+		float MovementSpeed = 1.f;
 
-	/*Move every BaseMovennetSpeedSecond / MovennetSpeedMultiplier seconds*/
+	// wait after every DelayInterval(seconds)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		float DelayInterval = 1.f;
+
+
+
+	// after the delay interval is reached, wait for DelayDuration(seconds)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		float DelayDuration = 1.f;
+
+
+	FTimerHandle TimerHandle_DelayMovement;
+
+	FTimerHandle TimerHandle_ResetMovement;
+
+	/*Move every BaseMovennetSpeedSecond / MovennetSpeedMultiplier seconds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
 		float MovennetSpeedMultiplier = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
-		float HorizontalMovementStride = 5;
+		float HorizontalMovementStride = 5;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
 		float VerticalMovementStride = 5;
@@ -83,8 +106,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
 		int32 currentHeightLevel = 0;
 
-	UPROPERTY()
-	FTimerHandle MovementTimerHandle;
+
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -97,6 +119,14 @@ protected:
 
 	TEnumAsByte<EMovementDirection> MovementDirection = EMovementDirection::Right;
 
+	TEnumAsByte<EEnemyMovementMode> MovementMode = EEnemyMovementMode::Freezed;
+
+
+	UFUNCTION(BlueprintCallable)
+		void SetMovementDirection(TEnumAsByte<EMovementDirection> NewMovementMode);
+
+	UFUNCTION(BlueprintCallable)
+		void SetMovementMode(TEnumAsByte < EEnemyMovementMode> NewMovementMode);
 
 
 	UFUNCTION()
@@ -106,10 +136,21 @@ protected:
 		void LeftBoxOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void Move();
+	void Move(float DeltaTime);
 	
+	UFUNCTION()
 	void SpawnAnEnemy(int EnemyTypeIndex, FVector SpawnLocation, FRotator SpawnRotation);
+
+	UFUNCTION()
 	void DestroyAllEnemies();
+
+	UFUNCTION()
+	void DelayMovmenet();
+
+	UFUNCTION()
+		void ResetMovement();
+
+
 
 };
 
