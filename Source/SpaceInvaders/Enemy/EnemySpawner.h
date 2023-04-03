@@ -1,0 +1,116 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "EnemySpawner.generated.h"
+
+class UBoxComponent;
+class AEnemyBaseActor;
+
+UENUM(BlueprintType)		
+enum EMovementDirection	
+{
+	Right UMETA(DisplayName = "Right"),	
+	Left UMETA(DisplayName = "Left"),
+	Down UMETA(DisplayName = "Down")
+};
+
+UCLASS()
+class SPACEINVADERS_API AEnemySpawner : public AActor
+{
+	GENERATED_BODY()
+
+		// the spawner is located on the top left of the enemies.
+
+
+public:	
+	// Sets default values for this actor's properties
+	AEnemySpawner();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+		int32 Row = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+		int32 Column= 2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+		float HorizontalStride = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+		float VerticalStride = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+		float boxMarginToScreenEnd = 1.f;
+
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = EnemySetting)
+		TArray<TSubclassOf<AEnemyBaseActor>> EnemyType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = EnemySetting)
+		TArray<TObjectPtr<AEnemyBaseActor>> Enemies;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		float BaseMovennetSpeedSecond = 1.f;
+
+	/*Move every BaseMovennetSpeedSecond / MovennetSpeedMultiplier seconds*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		float MovennetSpeedMultiplier = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		float HorizontalMovementStride = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		float VerticalMovementStride = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		int32 maxHeightLevel = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		int32 currentHeightLevel = 0;
+
+	UPROPERTY()
+	FTimerHandle MovementTimerHandle;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UBoxComponent> LeftBoxComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UBoxComponent> RightBoxComponent;
+
+	bool bRightBoxOverlapped = false;
+
+	TEnumAsByte<EMovementDirection> MovementDirection = EMovementDirection::Right;
+
+
+
+	UFUNCTION()
+		void RightBoxOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void LeftBoxOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void Move();
+	
+	void SpawnAnEnemy(int EnemyTypeIndex, FVector SpawnLocation, FRotator SpawnRotation);
+	void DestroyAllEnemies();
+
+};
+
+
