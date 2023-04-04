@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "ProjectileBaseActor.generated.h"
 
+class UBoxComponent;
+class UProjectileMovementComponent;
+
 UCLASS()
 class SPACEINVADERS_API AProjectileBaseActor : public AActor
 {
@@ -23,4 +26,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
+protected:
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UBoxComponent> BoxComponent;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> Mesh;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 };

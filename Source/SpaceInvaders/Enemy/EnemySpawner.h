@@ -91,13 +91,6 @@ protected:
 
 	FTimerHandle TimerHandle_ResetMovement;
 
-	/*Move every BaseMovennetSpeedSecond / MovennetSpeedMultiplier seconds
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
-		float MovennetSpeedMultiplier = 1.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
-		float HorizontalMovementStride = 5;*/
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
 		float VerticalMovementStride = 5;
 
