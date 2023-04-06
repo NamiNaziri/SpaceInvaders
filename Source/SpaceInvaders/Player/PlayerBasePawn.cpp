@@ -15,6 +15,8 @@
 
 #include "../Enemy/ProjectileBaseActor.h"
 
+#include "../Launcher/ProjectileLauncher.h"
+
 // Sets default values
 APlayerBasePawn::APlayerBasePawn()
 {
@@ -50,6 +52,8 @@ void APlayerBasePawn::BeginPlay()
 			Subsystem->AddMappingContext(Default_KBM_MappingContext, 0);
 		}
 	}
+
+	InitProjectileLauncher();
 	
 }
 
@@ -86,13 +90,32 @@ void APlayerBasePawn::Shoot(const FInputActionInstance& Instance)
 {
 	bool bShoot = Instance.GetValue().Get<bool>();
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	FVector SpawnLocation = GetActorLocation() + GetActorUpVector() * BoxComponent->GetScaledBoxExtent().Z;
+	if (!ProjectileLauncher)
+		return;
+
+	//FActorSpawnParameters SpawnParams;
+	//SpawnParams.Owner = this;
+	FVector ProjectileLocation = GetActorLocation() + GetActorUpVector() * BoxComponent->GetScaledBoxExtent().Z;
 
 	// Spawn the actor
-	AProjectileBaseActor* SpawnedProjectile = GetWorld()->SpawnActor<AProjectileBaseActor>(ProjectileType, SpawnLocation, GetActorRotation(), SpawnParams);
+	//AProjectileBaseActor* SpawnedProjectile = GetWorld()->SpawnActor<AProjectileBaseActor>(ProjectileType, SpawnLocation, GetActorRotation(), SpawnParams);
+	ProjectileLauncher->Launch(ProjectileLocation, GetActorRotation(), GetActorUpVector(), -1.f);
+	
+}
 
+void APlayerBasePawn::InitProjectileLauncher()
+{
 
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+
+	// Spawn the actor
+	ProjectileLauncher = GetWorld()->SpawnActor<AProjectileLauncher>(
+		ProjectileLauncherClass,
+		GetActorLocation(),
+		GetActorRotation(),
+		SpawnParams);
+	if(ProjectileLauncher)
+		ProjectileLauncher->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 }
 

@@ -5,7 +5,7 @@
 #include <Components/BoxComponent.h>
 #include "GameFramework/Actor.h"
 #include "EnemyBaseActor.h"
-
+#include "../Launcher/ProjectileLauncher.h"
 
 // Sets default values
 AEnemySpawner::AEnemySpawner()

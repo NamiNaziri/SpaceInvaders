@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../ObjectPool/PoolableObjectInterface.h"
+#include "Delegates/Delegate.h"
 #include "ProjectileBaseActor.generated.h"
 
 class UBoxComponent;
 class UProjectileMovementComponent;
 
 UCLASS()
-class SPACEINVADERS_API AProjectileBaseActor : public AActor
+class SPACEINVADERS_API AProjectileBaseActor : public AActor, public IPoolableObjectInterface
 {
 	GENERATED_BODY()
 	
@@ -40,4 +42,17 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		float Damage = 1.f;
+
+
+	UPROPERTY()
+		FOnPoolableObjectReleaseDelegate PoolableObjectReleaseDelegate;
+
+	UFUNCTION()
+	virtual FOnPoolableObjectReleaseDelegate& GetPoolableObjectReleaseDelegate() override;
+
+	UFUNCTION()
+		void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "EnemyBaseActor.generated.h"
 
+class UBoxComponent;
+
 UCLASS()
 class SPACEINVADERS_API AEnemyBaseActor : public AActor
 {
@@ -24,6 +26,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<UBoxComponent> BoxComponent;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<UStaticMeshComponent> Mesh;
 

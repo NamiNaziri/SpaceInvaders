@@ -11,7 +11,7 @@ class UInputAction;
 class UBoxComponent;
 class UPawnMovementComponent;
 class AProjectileBaseActor;
-
+class AProjectileLauncher;
 
 UCLASS()
 class SPACEINVADERS_API APlayerBasePawn : public APawn
@@ -63,7 +63,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Input)
 		TObjectPtr<UInputAction> ShootInputAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Shooting)
+		TSubclassOf<AProjectileLauncher> ProjectileLauncherClass;
 
+	UPROPERTY()
+	TObjectPtr<AProjectileLauncher> ProjectileLauncher;
 
 	UFUNCTION()
 		void Move(const FInputActionInstance& Instance);
@@ -71,4 +75,5 @@ private:
 	UFUNCTION()
 		void Shoot(const FInputActionInstance& Instance);
 
+	void InitProjectileLauncher();
 };
