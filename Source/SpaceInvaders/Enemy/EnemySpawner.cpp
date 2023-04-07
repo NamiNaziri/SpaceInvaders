@@ -19,14 +19,12 @@ AEnemySpawner::AEnemySpawner()
 	LeftBoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Left Box Component"));
 	LeftBoxComponent->SetupAttachment(RootComponent);
 	LeftBoxComponent->InitBoxExtent(FVector(50.f, 50.f, 50.f));
-	LeftBoxComponent->SetCollisionProfileName("OverlapProfile");
 	LeftBoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemySpawner::LeftBoxOnOverlapBegin);
 
 
 	RightBoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Right Box Component"));
 	RightBoxComponent->SetupAttachment(RootComponent);
 	RightBoxComponent->InitBoxExtent(FVector(50.f, 50.f, 50.f));
-	RightBoxComponent->SetCollisionProfileName("OverlapProfile");
 	RightBoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemySpawner::RightBoxOnOverlapBegin);
 	
 }
@@ -60,7 +58,6 @@ void AEnemySpawner::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	Move(DeltaTime);
-
 
 }
 

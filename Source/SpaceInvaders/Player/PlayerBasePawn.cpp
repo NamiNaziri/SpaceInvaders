@@ -30,11 +30,6 @@ APlayerBasePawn::APlayerBasePawn()
 	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>(TEXT("Pawn Movement"));
 	MovementComponent->UpdatedComponent = BoxComponent;
 
-
-	//TODO
-	//BoxComponent->SetCollisionProfileName("OverlapProfile");
-	//BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemySpawner::LeftBoxOnOverlapBegin);
-
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(RootComponent);
 }
