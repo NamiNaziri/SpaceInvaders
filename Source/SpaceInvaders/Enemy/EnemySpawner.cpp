@@ -40,6 +40,18 @@ void AEnemySpawner::BeginPlay()
 
 	GetWorldTimerManager().SetTimer(TimerHandle_DelayMovement, this, &AEnemySpawner::DelayMovmenet, DelayInterval + DelayDuration, true);
 
+	for (int i = 0; i < Column; i++)
+	{
+		DestroyedEnemiesPerColumn.Push(0);
+	}
+
+	LeftBoxCurrentColumn = 1;
+	RightBoxCurrentColumn = Column;
+
+	for (auto& Enemy : Enemies)
+	{
+		Enemy->OnEnemyHit.AddDynamic(this, &AEnemySpawner::OnEnemyHit);
+	}
 }
 
 // Called every frame
@@ -94,14 +106,14 @@ void AEnemySpawner::RightBoxOnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 {
 	currentHeightLevel++;
 	SetMovementDirection(EMovementDirection::Down);
-	bRightBoxOverlapped = true;
+	Direction *= -1;
 }
 
 void AEnemySpawner::LeftBoxOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	currentHeightLevel++;
 	SetMovementDirection(EMovementDirection::Down);
-	bRightBoxOverlapped = false;
+	Direction *= -1;
 }
 
 void AEnemySpawner::Move(float DeltaTime)
@@ -140,7 +152,7 @@ void AEnemySpawner::Move(float DeltaTime)
 				DelayMovmenet();
 			}
 			
-			if (bRightBoxOverlapped)
+			if (Direction < 0.f)
 			{
 				SetMovementDirection(EMovementDirection::Left);
 			}
@@ -197,4 +209,62 @@ void AEnemySpawner::ResetMovement()
 	
 	SetMovementMode(EEnemyMovementMode::Normal);
 	GetWorldTimerManager().ClearTimer(TimerHandle_ResetMovement);
+}
+
+void AEnemySpawner::OnEnemyHit(AEnemyBaseActor* Enemy)
+{
+	int index = Enemies.Find(Enemy);
+
+	//int EnemyRow = (index + 1) / Column;
+	int EnemyColumn = (index % Column) + 1;
+
+	DestroyedEnemiesPerColumn[EnemyColumn - 1]++;
+
+	if (DestroyedEnemiesPerColumn[EnemyColumn - 1] == Row)
+	{
+		if (LeftBoxCurrentColumn == EnemyColumn)
+		{
+			LeftBoxCurrentColumn++;
+			for (int i = EnemyColumn + 1; i <= Column; i++)
+			{
+				if (DestroyedEnemiesPerColumn[i - 1] == Row)
+				{
+					LeftBoxCurrentColumn++;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+
+
+		if (RightBoxCurrentColumn == EnemyColumn)
+		{
+			RightBoxCurrentColumn--;
+			for (int i = EnemyColumn - 1; i > 0; i--)
+			{
+				if (DestroyedEnemiesPerColumn[i - 1] == Row)
+				{
+					RightBoxCurrentColumn--;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	if (LeftBoxCurrentColumn == RightBoxCurrentColumn)
+	{
+		LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	
+	FVector LeftBoxNewPos = GetActorRightVector() * (((LeftBoxCurrentColumn - 1) * HorizontalStride) - boxMarginToScreenEnd);
+	FVector RightBoxNewPos = GetActorRightVector() * (((RightBoxCurrentColumn - 1) * HorizontalStride) - boxMarginToScreenEnd);
+
+
+	LeftBoxComponent->SetRelativeLocation(LeftBoxNewPos);
+	RightBoxComponent->SetRelativeLocation(RightBoxNewPos);
 }

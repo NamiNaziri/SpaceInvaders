@@ -73,6 +73,12 @@ protected:
 		TArray<TObjectPtr<AEnemyBaseActor>> Enemies;
 
 
+	
+	TArray<int32> DestroyedEnemiesPerColumn;
+
+	int32 LeftBoxCurrentColumn;
+	int32 RightBoxCurrentColumn;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
 		float MovementSpeed = 1.f;
 
@@ -99,7 +105,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
 		int32 currentHeightLevel = 0;
 
-
+	
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -108,7 +114,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBoxComponent> RightBoxComponent;
 
-	bool bRightBoxOverlapped = false;
+	float Direction = 1.f;
 
 	TEnumAsByte<EMovementDirection> MovementDirection = EMovementDirection::Right;
 
@@ -143,7 +149,8 @@ protected:
 	UFUNCTION()
 		void ResetMovement();
 
-
+	UFUNCTION()
+		void OnEnemyHit(AEnemyBaseActor* Enemy);
 
 };
 
