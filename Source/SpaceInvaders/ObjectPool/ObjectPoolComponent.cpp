@@ -19,7 +19,7 @@ void UObjectPoolComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnObjects(AmountOfObjects);
+	SpawnObjects(PoolCapacity);
 	
 }
 
@@ -47,15 +47,24 @@ TObjectPtr<AActor> UObjectPoolComponent::GetNewObjectInstance()
 		}
 	}
 	
-	// if not found, create a newObj
-	UE_LOG(LogTemp, Warning, TEXT("Object pool had shortage. A new object created."))
-	TObjectPtr<AActor> newObj = SpawnSingleObject();
-	PooledObjects[newObj] = true;
+	if (bShouldCreateNew)
+	{
+		// if not found, create a newObj
+		UE_LOG(LogTemp, Warning, TEXT("Object pool had shortage. A new object created."))
+			TObjectPtr<AActor> newObj = SpawnSingleObject();
+		PooledObjects[newObj] = true;
 
-	newObj->SetActorHiddenInGame(false);
-	newObj->SetActorEnableCollision(true);
+		newObj->SetActorHiddenInGame(false);
+		newObj->SetActorEnableCollision(true);
+		return newObj;
+	}
+	else
+	{
+		return nullptr;
+	}
+	
 
-	return newObj;
+	
 }
 
 void UObjectPoolComponent::ReleaseObjectInstanceToPool(AActor* ObjectInstance)
@@ -66,6 +75,11 @@ void UObjectPoolComponent::ReleaseObjectInstanceToPool(AActor* ObjectInstance)
 	ObjectInstance->SetActorLocation(FVector(0.f, -1000.f, 0.f));
 	PooledObjects[ObjectInstance] = false;
 
+}
+
+void UObjectPoolComponent::SetShouldCreateNew(bool ShouldCreateNew)
+{
+	this->bShouldCreateNew = ShouldCreateNew;
 }
 
 void UObjectPoolComponent::SpawnObjects(int num)

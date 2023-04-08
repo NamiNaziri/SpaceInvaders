@@ -36,10 +36,11 @@ public:
 	// Negative Speed uses the speed defined in the projectile component
 	void Launch(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed = -1.f);
 
+		TObjectPtr<UObjectPoolComponent> GetPoolComponent();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UObjectPoolComponent* PoolComponent;
+		TObjectPtr<UObjectPoolComponent> PoolComponent;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Settings")
 		//TSubclassOf<AProjectileBaseActor> ProjectileClass;

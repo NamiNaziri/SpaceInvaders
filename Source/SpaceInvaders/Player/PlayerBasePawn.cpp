@@ -14,8 +14,8 @@
 #include <GameFramework/FloatingPawnMovement.h>
 
 #include "../Enemy/ProjectileBaseActor.h"
-
 #include "../Launcher/ProjectileLauncher.h"
+#include "../ObjectPool/ObjectPoolComponent.h"
 
 // Sets default values
 APlayerBasePawn::APlayerBasePawn()
@@ -33,6 +33,8 @@ APlayerBasePawn::APlayerBasePawn()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(RootComponent);
+
+	bCanShoot = true;
 }
 
 // Called when the game starts or when spawned
@@ -50,6 +52,7 @@ void APlayerBasePawn::BeginPlay()
 	}
 
 	InitProjectileLauncher();
+
 	
 }
 
@@ -84,18 +87,41 @@ void APlayerBasePawn::Move(const FInputActionInstance& Instance)
 
 void APlayerBasePawn::Shoot(const FInputActionInstance& Instance)
 {
-	bool bShoot = Instance.GetValue().Get<bool>();
+	if (FireRateMode == EFireRateMode::TimerBased && bCanShoot)
+	{
+		bCanShoot = false;
+		if (!ProjectileLauncher)
+			return;
 
-	if (!ProjectileLauncher)
-		return;
+		FVector ProjectileLocation = GetActorLocation() + GetActorUpVector() * BoxComponent->GetScaledBoxExtent().Z;
+		ProjectileLauncher->Launch(ProjectileLocation, GetActorRotation(), GetActorUpVector(), -1.f);
 
-	FVector ProjectileLocation = GetActorLocation() + GetActorUpVector() * BoxComponent->GetScaledBoxExtent().Z;
-	ProjectileLauncher->Launch(ProjectileLocation, GetActorRotation(), GetActorUpVector(), -1.f);
+		FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &APlayerBasePawn::CanShoot);
+		GetWorldTimerManager().SetTimer(
+			TimerHandle_CanShoot,
+			TimerDelagate,
+			FireRate,
+			false);
+	}
+	else if (FireRateMode == EFireRateMode::AvailabilityBased)
+	{
+		if (!ProjectileLauncher)
+			return;
+
+		FVector ProjectileLocation = GetActorLocation() + GetActorUpVector() * BoxComponent->GetScaledBoxExtent().Z;
+		ProjectileLauncher->Launch(ProjectileLocation, GetActorRotation(), GetActorUpVector(), -1.f);
+	}
 	
 }
 
 void APlayerBasePawn::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+}
+
+void APlayerBasePawn::CanShoot()
+{
+	bCanShoot = true;
+	GetWorldTimerManager().ClearTimer(TimerHandle_CanShoot);
 }
 
 void APlayerBasePawn::InitProjectileLauncher()
@@ -112,5 +138,10 @@ void APlayerBasePawn::InitProjectileLauncher()
 		SpawnParams);
 	if(ProjectileLauncher)
 		ProjectileLauncher->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+
+	if (FireRateMode == EFireRateMode::AvailabilityBased)
+	{
+		ProjectileLauncher->GetPoolComponent()->SetShouldCreateNew(false);
+	}
 }
 

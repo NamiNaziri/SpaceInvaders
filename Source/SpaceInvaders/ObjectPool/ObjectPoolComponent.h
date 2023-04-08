@@ -29,13 +29,23 @@ public:
 	UFUNCTION()
 	void ReleaseObjectInstanceToPool(AActor* ObjectInstance);
 
+	UFUNCTION()
+		void SetShouldCreateNew(bool ShouldCreateNew);
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Settings")
 		TSubclassOf<AActor> ClassToSpawn;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Settings")
-		int AmountOfObjects = 1;
+		int PoolCapacity = 1;
+
+	/*
+	* Should create new object if there is no remaining object in the pool.
+	* if false will return nullptr when asking for new object and the pool is empty
+	*/
+	UPROPERTY()
+		bool bShouldCreateNew = true;
 
 	// A map between actors and a bool. the boolean shows whether the actor is currently used or not.
 	UPROPERTY()

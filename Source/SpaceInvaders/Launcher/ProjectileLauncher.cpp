@@ -54,7 +54,10 @@ void AProjectileLauncher::Launch(FVector Location, FRotator Rotation, FVector La
 			PMC->Velocity = LaunchDirection;
 		}
 	}
-	
-	//Projectile->getprojec
+}
+
+TObjectPtr<UObjectPoolComponent> AProjectileLauncher::GetPoolComponent()
+{
+	return PoolComponent;
 }
 
