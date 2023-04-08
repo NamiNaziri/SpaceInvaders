@@ -47,6 +47,7 @@ protected:
 		float Damage = 1.f;
 
 
+
 	UPROPERTY()
 		FOnPoolableObjectReleaseDelegate PoolableObjectReleaseDelegate;
 

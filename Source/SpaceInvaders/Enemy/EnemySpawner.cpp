@@ -41,6 +41,7 @@ void AEnemySpawner::BeginPlay()
 	for (int i = 0; i < Column; i++)
 	{
 		DestroyedEnemiesPerColumn.Push(0);
+		ShootersIndex.Push(Row-1);
 	}
 
 	LeftBoxCurrentColumn = 1;
@@ -50,6 +51,17 @@ void AEnemySpawner::BeginPlay()
 	{
 		Enemy->OnEnemyHit.AddDynamic(this, &AEnemySpawner::OnEnemyHit);
 	}
+
+
+	FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::FireAtPlayer);
+	GetWorldTimerManager().SetTimer(
+		TimerHandle_FireAtPlayer,
+		TimerDelagate,
+		FireRate,
+		true);
+
+	RemainingEnemyCount = Row * Column;
+	CurrentMovementSpeed = MovementSpeed;
 }
 
 // Called every frame
@@ -101,6 +113,10 @@ void AEnemySpawner::SetMovementMode(TEnumAsByte<EEnemyMovementMode> NewMovementM
 
 void AEnemySpawner::RightBoxOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (OtherActor == this || OtherActor == GetOwner())
+	{
+		return;
+	}
 	currentHeightLevel++;
 	SetMovementDirection(EMovementDirection::Down);
 	Direction *= -1;
@@ -108,6 +124,10 @@ void AEnemySpawner::RightBoxOnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 
 void AEnemySpawner::LeftBoxOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (OtherActor == this || OtherActor == GetOwner())
+	{
+		return;
+	}
 	currentHeightLevel++;
 	SetMovementDirection(EMovementDirection::Down);
 	Direction *= -1;
@@ -128,11 +148,11 @@ void AEnemySpawner::Move(float DeltaTime)
 	{
 		case EMovementDirection::Right:
 			
-			SetActorLocation(CurrentLocation + GetActorRightVector() * MovementSpeed * DeltaTime);
+			SetActorLocation(CurrentLocation + GetActorRightVector() * CurrentMovementSpeed * DeltaTime);
 			break;
 
 		case EMovementDirection::Left:
-			SetActorLocation(CurrentLocation - GetActorRightVector() * MovementSpeed * DeltaTime);
+			SetActorLocation(CurrentLocation - GetActorRightVector() * CurrentMovementSpeed * DeltaTime);
 			break;
 
 		case EMovementDirection::Down:
@@ -210,10 +230,17 @@ void AEnemySpawner::ResetMovement()
 
 void AEnemySpawner::OnEnemyHit(AEnemyBaseActor* Enemy)
 {
-	int index = Enemies.Find(Enemy);
+	RemainingEnemyCount--;
+	int Index = Enemies.Find(Enemy);
+	UpdateEdgeScreenBoxes(Index);
+	UpdateShooter(Index);
+	UpdateMovementSpeed();
+}
 
+void AEnemySpawner::UpdateEdgeScreenBoxes(int EnemyIndex)
+{
 	//int EnemyRow = (index + 1) / Column;
-	int EnemyColumn = (index % Column) + 1;
+	int EnemyColumn = (EnemyIndex % Column) + 1; // starting from 1
 
 	DestroyedEnemiesPerColumn[EnemyColumn - 1]++;
 
@@ -257,11 +284,71 @@ void AEnemySpawner::OnEnemyHit(AEnemyBaseActor* Enemy)
 	{
 		LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
-	
+
 	FVector LeftBoxNewPos = GetActorRightVector() * (((LeftBoxCurrentColumn - 1) * HorizontalStride) - boxMarginToScreenEnd);
 	FVector RightBoxNewPos = GetActorRightVector() * (((RightBoxCurrentColumn - 1) * HorizontalStride) - boxMarginToScreenEnd);
 
 
 	LeftBoxComponent->SetRelativeLocation(LeftBoxNewPos);
 	RightBoxComponent->SetRelativeLocation(RightBoxNewPos);
+}
+
+void AEnemySpawner::UpdateShooter(int EnemyIndex)
+{
+	int EnemyRow = (EnemyIndex / Column); // starting from 0
+	int EnemyColumn = (EnemyIndex % Column); // starting from 0
+
+	if (ShootersIndex[EnemyColumn] == EnemyRow)
+	{
+		for (int r = EnemyRow - 1; r >= 0; r--)
+		{
+			if (GetEnemy(r, EnemyColumn)->IsEnemyEnable())
+			{
+				ShootersIndex[EnemyColumn] = r;
+				return;
+			}
+		}
+	}
+
+	ShootersIndex[EnemyColumn] = -1;
+
+}
+
+TObjectPtr<AEnemyBaseActor> AEnemySpawner::GetEnemy(int r, int c)
+{
+	if (Enemies.IsValidIndex(r * Column + c))
+	{
+		return Enemies[r * Column + c];
+	}
+	return nullptr;
+}
+
+void AEnemySpawner::FireAtPlayer()
+{
+	//TODO change the timer!?
+	int RandomEnemyColumn = FMath::RandRange(0, Column - 1);
+	int RandomEnemyRow = ShootersIndex[RandomEnemyColumn];
+	TObjectPtr<AEnemyBaseActor> enemy = GetEnemy(RandomEnemyRow, RandomEnemyColumn);
+	if (enemy)
+	{
+		enemy->Shoot();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AEnemySpawner::FireAtPlayer -> index is not valid"));
+	}
+	
+
+}
+
+void AEnemySpawner::UpdateMovementSpeed()
+{
+	float alpha = 1.f - ((float)RemainingEnemyCount / (float)((Row * Column) - 1)); // linear blend
+
+	if (SpeedChangeRateCurve)
+	{
+		alpha = SpeedChangeRateCurve->GetFloatValue(alpha);
+	}
+
+	CurrentMovementSpeed = FMath::Lerp(MovementSpeed, MaxMovementSpeed, alpha);
 }

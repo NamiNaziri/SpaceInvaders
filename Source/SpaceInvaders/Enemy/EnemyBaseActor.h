@@ -8,7 +8,8 @@
 #include "EnemyBaseActor.generated.h"
 
 class UBoxComponent;
-
+class AProjectileBaseActor;
+class AProjectileLauncher;
 
 UDELEGATE()
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyHit, AEnemyBaseActor*, HitEnemy);
@@ -32,6 +33,13 @@ public:
 
 	FOnEnemyHit OnEnemyHit;
 
+	const bool& IsEnemyEnable();
+	void SetEnemyEnable(bool bIsEnabled);
+
+
+	UFUNCTION()
+		void Shoot();
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -40,10 +48,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<UStaticMeshComponent> Mesh;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Shooting)
+		TSubclassOf<AProjectileLauncher> ProjectileLauncherClass;
+
+	UPROPERTY()
+		TObjectPtr<AProjectileLauncher> ProjectileLauncher;
+
+
+
+	bool bIsEnemyEnabled = true;
 
 	UFUNCTION()
 		void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 
+	void InitProjectileLauncher();
 };

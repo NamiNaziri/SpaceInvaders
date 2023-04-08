@@ -82,6 +82,7 @@ TObjectPtr<AActor> UObjectPoolComponent::SpawnSingleObject()
 	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = GetOwner();
+		SpawnParams.Instigator = Cast<APawn>(GetOwner());
 
 		// Spawn the actor
 		AActor* SpawnedObject = GetWorld()->SpawnActor<AActor>(ClassToSpawn, FVector(0.f, -1000.f, 0.f), FRotator(0.f), SpawnParams);

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Curves/CurveFloat.h"
 #include "EnemySpawner.generated.h"
 
 class UBoxComponent;
@@ -72,15 +73,33 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = EnemySetting)
 		TArray<TObjectPtr<AEnemyBaseActor>> Enemies;
 
-
+	// Row index (starting from zero) for each shooter in the column. This array is the same size as the column.
+	// -1 means all enemies in the column are destroyed.
+	TArray<int32> ShootersIndex;
 	
 	TArray<int32> DestroyedEnemiesPerColumn;
 
 	int32 LeftBoxCurrentColumn;
 	int32 RightBoxCurrentColumn;
 
+	int RemainingEnemyCount;
+
+	/*Base movement speed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
-		float MovementSpeed = 1.f;
+		float MovementSpeed = 400.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	/*Current Movement Speed*/
+	float CurrentMovementSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		float MaxMovementSpeed = 1000.f;
+	/*
+	* This curve needs to be normalized between zero and one, as it will determine how the speed increases when an enemy is destroyed.
+	* If the curve does not exist, a linear rate will be applied instead.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+		UCurveFloat* SpeedChangeRateCurve;
 
 	// wait after every DelayInterval(seconds)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
@@ -106,7 +125,11 @@ protected:
 		int32 currentHeightLevel = 0;
 
 	
+	// Rate at which a weapon can fire projectiles. 1 shot per second.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Shooting)
+		float FireRate = 1.f;
 
+	FTimerHandle TimerHandle_FireAtPlayer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBoxComponent> LeftBoxComponent;
@@ -152,6 +175,20 @@ protected:
 	UFUNCTION()
 		void OnEnemyHit(AEnemyBaseActor* Enemy);
 
+	UFUNCTION()
+		void UpdateEdgeScreenBoxes(int EnemyIndex);
+
+	UFUNCTION()
+		void UpdateMovementSpeed();
+
+	UFUNCTION()
+		void UpdateShooter(int EnemyIndex);
+
+	UFUNCTION()
+		void FireAtPlayer();
+
+
+	TObjectPtr<AEnemyBaseActor> GetEnemy(int r, int c);
 };
 
 

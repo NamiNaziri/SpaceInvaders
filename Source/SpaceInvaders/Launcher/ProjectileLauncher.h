@@ -9,6 +9,11 @@
 class UObjectPoolComponent;
 class AProjectileBaseActor;
 
+
+/*
+*	This class has a pool of projectile base actor and can launch a projectile.
+*/
+
 UCLASS()
 class SPACEINVADERS_API AProjectileLauncher : public AActor
 {
