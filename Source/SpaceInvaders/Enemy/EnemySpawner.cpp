@@ -4,7 +4,7 @@
 #include "EnemySpawner.h"
 #include <Components/BoxComponent.h>
 #include "GameFramework/Actor.h"
-#include "EnemyBaseActor.h"
+#include "EnemyBasePawn.h"
 #include "../Launcher/ProjectileLauncher.h"
 
 // Sets default values
@@ -192,7 +192,7 @@ void AEnemySpawner::SpawnAnEnemy(int EnemyTypeIndex, FVector SpawnLocation, FRot
 		SpawnParams.Owner = this;
 		
 		// Spawn the actor
-		AEnemyBaseActor* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBaseActor>(EnemyType[EnemyTypeIndex], SpawnLocation, SpawnRotation, SpawnParams);
+		AEnemyBasePawn* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBasePawn>(EnemyType[EnemyTypeIndex], SpawnLocation, SpawnRotation, SpawnParams);
 		Enemies.Push(SpawnedEnemy);
 		SpawnedEnemy->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 	}
@@ -228,7 +228,7 @@ void AEnemySpawner::ResetMovement()
 	GetWorldTimerManager().ClearTimer(TimerHandle_ResetMovement);
 }
 
-void AEnemySpawner::OnEnemyHit(AEnemyBaseActor* Enemy)
+void AEnemySpawner::OnEnemyHit(AEnemyBasePawn* Enemy)
 {
 	RemainingEnemyCount--;
 	int Index = Enemies.Find(Enemy);
@@ -314,7 +314,7 @@ void AEnemySpawner::UpdateShooter(int EnemyIndex)
 
 }
 
-TObjectPtr<AEnemyBaseActor> AEnemySpawner::GetEnemy(int r, int c)
+TObjectPtr<AEnemyBasePawn> AEnemySpawner::GetEnemy(int r, int c)
 {
 	if (Enemies.IsValidIndex(r * Column + c))
 	{
@@ -328,7 +328,7 @@ void AEnemySpawner::FireAtPlayer()
 	//TODO change the timer!?
 	int RandomEnemyColumn = FMath::RandRange(0, Column - 1);
 	int RandomEnemyRow = ShootersIndex[RandomEnemyColumn];
-	TObjectPtr<AEnemyBaseActor> enemy = GetEnemy(RandomEnemyRow, RandomEnemyColumn);
+	TObjectPtr<AEnemyBasePawn> enemy = GetEnemy(RandomEnemyRow, RandomEnemyColumn);
 	if (enemy)
 	{
 		enemy->Shoot();

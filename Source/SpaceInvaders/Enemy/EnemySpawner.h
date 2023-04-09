@@ -8,7 +8,7 @@
 #include "EnemySpawner.generated.h"
 
 class UBoxComponent;
-class AEnemyBaseActor;
+class AEnemyBasePawn;
 
 UENUM(BlueprintType)		
 enum EMovementDirection	
@@ -68,10 +68,10 @@ protected:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = EnemySetting)
-		TArray<TSubclassOf<AEnemyBaseActor>> EnemyType;
+		TArray<TSubclassOf<AEnemyBasePawn>> EnemyType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = EnemySetting)
-		TArray<TObjectPtr<AEnemyBaseActor>> Enemies;
+		TArray<TObjectPtr<AEnemyBasePawn>> Enemies;
 
 	// Row index (starting from zero) for each shooter in the column. This array is the same size as the column.
 	// -1 means all enemies in the column are destroyed.
@@ -173,7 +173,7 @@ protected:
 		void ResetMovement();
 
 	UFUNCTION()
-		void OnEnemyHit(AEnemyBaseActor* Enemy);
+		void OnEnemyHit(AEnemyBasePawn* Enemy);
 
 	UFUNCTION()
 		void UpdateEdgeScreenBoxes(int EnemyIndex);
@@ -188,7 +188,7 @@ protected:
 		void FireAtPlayer();
 
 
-	TObjectPtr<AEnemyBaseActor> GetEnemy(int r, int c);
+	TObjectPtr<AEnemyBasePawn> GetEnemy(int r, int c);
 };
 
 

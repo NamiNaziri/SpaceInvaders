@@ -4,14 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "../Pawn/BasePawn.h"
 #include "PlayerBasePawn.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
-class UBoxComponent;
-class UPawnMovementComponent;
-class AProjectileBaseActor;
-class AProjectileLauncher;
 
 
 /*
@@ -30,7 +27,7 @@ enum EFireRateMode
 
 
 UCLASS()
-class SPACEINVADERS_API APlayerBasePawn : public APawn
+class SPACEINVADERS_API APlayerBasePawn : public ABasePawn
 {
 	GENERATED_BODY()
 
@@ -56,19 +53,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Movement)
 		float MovementSpeed = 20.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Projectile)
-	TSubclassOf<AProjectileBaseActor> ProjectileType;
-
 	UPROPERTY(Category = Pawn, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<UPawnMovementComponent> MovementComponent;
 
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<UBoxComponent> BoxComponent;
-
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<UStaticMeshComponent> Mesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Input)
 	TObjectPtr<UInputMappingContext> Default_KBM_MappingContext;
@@ -79,8 +66,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Input)
 		TObjectPtr<UInputAction> ShootInputAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Shooting)
-		TSubclassOf<AProjectileLauncher> ProjectileLauncherClass;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Shooting)
 		TEnumAsByte<EFireRateMode> FireRateMode= EFireRateMode::AvailabilityBased;
@@ -93,8 +79,9 @@ protected:
 
 	bool bCanShoot = true;
 
-	UPROPERTY()
-	TObjectPtr<AProjectileLauncher> ProjectileLauncher;
+		virtual void TakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
+
+		virtual void HealthBecomeZero(AActor* OwnerActor) override;
 
 	UFUNCTION()
 		void Move(const FInputActionInstance& Instance);
@@ -102,11 +89,10 @@ protected:
 	UFUNCTION()
 		void Shoot(const FInputActionInstance& Instance);
 
-	UFUNCTION()
-		void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 
 	UFUNCTION()
 		void CanShoot();
 
-	void InitProjectileLauncher();
+	virtual void InitProjectileLauncher() override;
 };

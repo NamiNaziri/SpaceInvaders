@@ -3,25 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Delegates/Delegate.h"
-#include "EnemyBaseActor.generated.h"
+#include "GameFramework/Pawn.h"
+#include "BasePawn.generated.h"
 
 class UBoxComponent;
 class AProjectileBaseActor;
 class AProjectileLauncher;
-
-UDELEGATE()
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyHit, AEnemyBaseActor*, HitEnemy);
+class UHealthComponent;
 
 UCLASS()
-class SPACEINVADERS_API AEnemyBaseActor : public AActor
+class SPACEINVADERS_API ABasePawn : public APawn
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AEnemyBaseActor();
+
+public:
+	// Sets default values for this pawn's properties
+	ABasePawn();
 
 protected:
 	// Called when the game starts or when spawned
@@ -31,14 +28,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	FOnEnemyHit OnEnemyHit;
-
-	const bool& IsEnemyEnable();
-	void SetEnemyEnable(bool bIsEnabled);
-
-
-	UFUNCTION()
-		void Shoot();
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
 
@@ -54,13 +45,14 @@ protected:
 	UPROPERTY()
 		TObjectPtr<AProjectileLauncher> ProjectileLauncher;
 
-
-
-	bool bIsEnemyEnabled = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Health)
+	TObjectPtr<UHealthComponent> HealthComponent;
 
 	UFUNCTION()
-		void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		virtual void TakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
 
+	UFUNCTION()
+		virtual void HealthBecomeZero(AActor* OwnerActor);
 
-	void InitProjectileLauncher();
+	virtual void InitProjectileLauncher();
 };

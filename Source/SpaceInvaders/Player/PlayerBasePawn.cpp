@@ -16,6 +16,7 @@
 #include "../Enemy/ProjectileBaseActor.h"
 #include "../Launcher/ProjectileLauncher.h"
 #include "../ObjectPool/ObjectPoolComponent.h"
+#include "../GameComponents/Health/HealthComponent.h"
 
 // Sets default values
 APlayerBasePawn::APlayerBasePawn()
@@ -23,16 +24,8 @@ APlayerBasePawn::APlayerBasePawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BoxComponent = CreateDefaultSubobject <UBoxComponent>(TEXT("Box Component"));
-	BoxComponent->InitBoxExtent(FVector(50.f, 50.f, 50.f));
-	SetRootComponent(BoxComponent);
-	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &APlayerBasePawn::OnBoxBeginOverlap);
-
 	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>(TEXT("Pawn Movement"));
 	MovementComponent->UpdatedComponent = BoxComponent;
-
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	Mesh->SetupAttachment(RootComponent);
 
 	bCanShoot = true;
 }
@@ -51,8 +44,7 @@ void APlayerBasePawn::BeginPlay()
 		}
 	}
 
-	InitProjectileLauncher();
-
+	
 	
 }
 
@@ -73,6 +65,18 @@ void APlayerBasePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Input->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &APlayerBasePawn::Move);
 
 	Input->BindAction(ShootInputAction, ETriggerEvent::Triggered, this, &APlayerBasePawn::Shoot);
+}
+
+void APlayerBasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Player took damage"));
+
+	HealthComponent->DecreaseHealth(Damage);
+}
+
+void APlayerBasePawn::HealthBecomeZero(AActor* OwnerActor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Player is dead"));
 }
 
 void APlayerBasePawn::Move(const FInputActionInstance& Instance)
@@ -114,10 +118,6 @@ void APlayerBasePawn::Shoot(const FInputActionInstance& Instance)
 	
 }
 
-void APlayerBasePawn::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-}
-
 void APlayerBasePawn::CanShoot()
 {
 	bCanShoot = true;
@@ -126,18 +126,7 @@ void APlayerBasePawn::CanShoot()
 
 void APlayerBasePawn::InitProjectileLauncher()
 {
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-
-	// Spawn the actor
-	ProjectileLauncher = GetWorld()->SpawnActor<AProjectileLauncher>(
-		ProjectileLauncherClass,
-		GetActorLocation(),
-		GetActorRotation(),
-		SpawnParams);
-	if(ProjectileLauncher)
-		ProjectileLauncher->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	Super::InitProjectileLauncher();
 
 	if (FireRateMode == EFireRateMode::AvailabilityBased)
 	{

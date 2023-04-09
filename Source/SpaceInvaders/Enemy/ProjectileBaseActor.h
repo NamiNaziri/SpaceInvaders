@@ -46,8 +46,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		float Damage = 1.f;
 
-
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<UDamageType> DamageType;
 	UPROPERTY()
 		FOnPoolableObjectReleaseDelegate PoolableObjectReleaseDelegate;
 

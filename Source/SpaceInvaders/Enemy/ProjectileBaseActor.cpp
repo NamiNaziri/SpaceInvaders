@@ -3,7 +3,7 @@
 
 #include "ProjectileBaseActor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-
+#include "Engine/DamageEvents.h"
 #include "Delegates/Delegate.h"
 #include <Components/BoxComponent.h>
 
@@ -56,8 +56,13 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("OnBoxBeginOverlap"))
+	// apply point damage
+	//APawn* Pawn = Cast<APawn>(GetOwner());
+	FPointDamageEvent PDE;
+	OtherActor->TakeDamage(Damage, PDE, nullptr, this);
 	//TODO perfrom emitter and stuff
+
+
 	PoolableObjectReleaseDelegate.Broadcast(this);
 }
 

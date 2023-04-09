@@ -42,6 +42,4 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<UObjectPoolComponent> PoolComponent;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Settings")
-		//TSubclassOf<AProjectileBaseActor> ProjectileClass;
 };
