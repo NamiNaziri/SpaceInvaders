@@ -173,7 +173,7 @@ protected:
 		void ResetMovement();
 
 	UFUNCTION()
-		void OnEnemyHit(AEnemyBasePawn* Enemy);
+		void OnEnemyDestroyed(AEnemyBasePawn* Enemy);
 
 	UFUNCTION()
 		void UpdateEdgeScreenBoxes(int EnemyIndex);

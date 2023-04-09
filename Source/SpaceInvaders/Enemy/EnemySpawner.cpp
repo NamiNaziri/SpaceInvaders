@@ -49,7 +49,7 @@ void AEnemySpawner::BeginPlay()
 
 	for (auto& Enemy : Enemies)
 	{
-		Enemy->OnEnemyHit.AddDynamic(this, &AEnemySpawner::OnEnemyHit);
+		Enemy->OnEnemyDestroyed.AddDynamic(this, &AEnemySpawner::OnEnemyDestroyed);
 	}
 
 
@@ -228,7 +228,7 @@ void AEnemySpawner::ResetMovement()
 	GetWorldTimerManager().ClearTimer(TimerHandle_ResetMovement);
 }
 
-void AEnemySpawner::OnEnemyHit(AEnemyBasePawn* Enemy)
+void AEnemySpawner::OnEnemyDestroyed(AEnemyBasePawn* Enemy)
 {
 	RemainingEnemyCount--;
 	int Index = Enemies.Find(Enemy);

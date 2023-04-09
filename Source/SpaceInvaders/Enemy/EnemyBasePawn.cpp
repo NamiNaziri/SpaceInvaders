@@ -55,9 +55,6 @@ void AEnemyBasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AContro
 	//TODO make this better (visually)
 
 	HealthComponent->DecreaseHealth(Damage);
-	OnEnemyHit.Broadcast(this);
-
-
 }
 
 void AEnemyBasePawn::HealthBecomeZero(AActor* OwnerActor)
@@ -67,4 +64,6 @@ void AEnemyBasePawn::HealthBecomeZero(AActor* OwnerActor)
 	this->SetActorEnableCollision(false);
 	this->SetActorLocation(FVector(0.f, -1000.f, 0.f));
 	this->SetEnemyEnable(false);
+
+	OnEnemyDestroyed.Broadcast(this);
 }

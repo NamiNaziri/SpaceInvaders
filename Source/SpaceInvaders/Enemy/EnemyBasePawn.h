@@ -10,7 +10,7 @@
 
 
 UDELEGATE()
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyHit, AEnemyBasePawn*, HitEnemy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyDestroyed, AEnemyBasePawn*, HitEnemy);
 
 UCLASS()
 class SPACEINVADERS_API AEnemyBasePawn : public ABasePawn
@@ -29,7 +29,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	FOnEnemyHit OnEnemyHit;
+	FOnEnemyDestroyed OnEnemyDestroyed;
 
 	const bool& IsEnemyEnable();
 	void SetEnemyEnable(bool bIsEnabled);
