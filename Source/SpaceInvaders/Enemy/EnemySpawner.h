@@ -48,6 +48,8 @@ public:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	void ResetSpawner(int Level);
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
@@ -186,6 +188,10 @@ protected:
 
 	UFUNCTION()
 		void FireAtPlayer();
+
+	UFUNCTION()
+		void InitializeSpawner();
+
 
 
 	TObjectPtr<AEnemyBasePawn> GetEnemy(int r, int c);

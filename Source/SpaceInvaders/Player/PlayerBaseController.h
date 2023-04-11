@@ -13,5 +13,14 @@ UCLASS()
 class SPACEINVADERS_API APlayerBaseController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+
+	void AddScore(float ScoreToAdd);
+	void SetHealth(float Health);
+	void SetMaxHealth(float MaxHealth);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Death")
+		void RecieveOnDeath();
 	
 };

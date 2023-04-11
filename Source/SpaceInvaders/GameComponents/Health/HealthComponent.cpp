@@ -41,3 +41,18 @@ void UHealthComponent::DecreaseHealth(float Damage)
 	}
 }
 
+float UHealthComponent::GetMaxHealth()
+{
+	return this->MaxHealth;
+}
+
+float UHealthComponent::GetCurrentHealth()
+{
+	return CurrentHealth;
+}
+
+void UHealthComponent::ResetHealth()
+{
+	CurrentHealth = MaxHealth;
+}
+

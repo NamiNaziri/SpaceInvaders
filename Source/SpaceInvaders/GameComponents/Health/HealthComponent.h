@@ -11,6 +11,7 @@
 UDELEGATE()
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthBecomeZero, AActor*, OwnerActor);
 
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEINVADERS_API UHealthComponent : public UActorComponent
 {
@@ -30,6 +31,11 @@ public:
 
 	// Decrease the health of the character by a specified amount
 	void DecreaseHealth(float Damage);
+
+	float GetMaxHealth();
+	float GetCurrentHealth();
+
+	void ResetHealth();
 
 	FOnHealthBecomeZero OnHealthBecomeZero;
 

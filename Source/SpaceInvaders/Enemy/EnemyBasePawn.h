@@ -34,18 +34,26 @@ public:
 	const bool& IsEnemyEnable();
 	void SetEnemyEnable(bool bIsEnabled);
 
-
 	UFUNCTION()
 		void Shoot();
 
+	virtual void Reset() override;
+
 protected:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Points)
+		float PointsPerKill = 10.f;
 
-	bool bIsEnemyEnabled = true;
+	UPROPERTY()
+		AController* LastInstigator;
+
+	UPROPERTY()
+		bool bIsEnemyEnabled = true;
 
 
-		virtual void TakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
+	virtual void TakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
 
-		virtual void HealthBecomeZero(AActor* OwnerActor) override;
+	virtual void HealthBecomeZero(AActor* OwnerActor) override;
+
 
 };

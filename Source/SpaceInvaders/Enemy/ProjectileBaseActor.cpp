@@ -55,14 +55,32 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 	{
 		return;
 	}
+	
+	
+	/*
+	* Before resetting the enemies that depend on the TakeDamage function, the projectile should be released in order to disable the collision.. 
+	* The problem with collision happens when resetting enemies. 
+	* If the projectile still has collision, it can collide and kill an enemy while we are resetting the last enemy.
+	*/
+	PoolableObjectReleaseDelegate.Broadcast(this);
 
 	// apply point damage
-	//APawn* Pawn = Cast<APawn>(GetOwner());
+	AController* EventInstigator = nullptr;
+	AActor* OwnerProjectile = GetOwner();
+	if (OwnerProjectile)
+	{
+		APawn* OwnerPawn = Cast<APawn>(OwnerProjectile->GetOwner());
+		if (OwnerPawn)
+		{
+			EventInstigator = OwnerPawn->GetController();
+		}
+	}
+	
+
 	FPointDamageEvent PDE;
-	OtherActor->TakeDamage(Damage, PDE, nullptr, this);
+	OtherActor->TakeDamage(Damage, PDE, EventInstigator, this);
 	//TODO perfrom emitter and stuff
 
 
-	PoolableObjectReleaseDelegate.Broadcast(this);
 }
 

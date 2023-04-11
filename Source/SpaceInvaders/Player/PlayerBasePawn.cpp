@@ -17,6 +17,7 @@
 #include "../Launcher/ProjectileLauncher.h"
 #include "../ObjectPool/ObjectPoolComponent.h"
 #include "../GameComponents/Health/HealthComponent.h"
+#include "PlayerBaseController.h"
 
 // Sets default values
 APlayerBasePawn::APlayerBasePawn()
@@ -28,6 +29,8 @@ APlayerBasePawn::APlayerBasePawn()
 	MovementComponent->UpdatedComponent = BoxComponent;
 
 	bCanShoot = true;
+
+
 }
 
 // Called when the game starts or when spawned
@@ -44,8 +47,11 @@ void APlayerBasePawn::BeginPlay()
 		}
 	}
 
-	
-	
+
+
+	APlayerBaseController* PBC = GetController<APlayerBaseController>();
+	PBC->SetMaxHealth(HealthComponent->GetMaxHealth());
+
 }
 
 // Called every frame
@@ -72,11 +78,15 @@ void APlayerBasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AContr
 	UE_LOG(LogTemp, Warning, TEXT("Player took damage"));
 
 	HealthComponent->DecreaseHealth(Damage);
+	APlayerBaseController* PBC = GetController<APlayerBaseController>();
+	PBC->SetHealth(HealthComponent->GetCurrentHealth());
 }
 
 void APlayerBasePawn::HealthBecomeZero(AActor* OwnerActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Player is dead"));
+	//UE_LOG(LogTemp, Warning, TEXT("Player is dead"));
+	APlayerBaseController* PBC = GetController<APlayerBaseController>();
+	PBC->RecieveOnDeath();
 }
 
 void APlayerBasePawn::Move(const FInputActionInstance& Instance)

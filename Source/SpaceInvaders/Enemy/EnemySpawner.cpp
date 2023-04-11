@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "EnemyBasePawn.h"
 #include "../Launcher/ProjectileLauncher.h"
+#include "../Game/CoreGameState.h"
+#include "../Game/CoreGameMode.h"
 
 // Sets default values
 AEnemySpawner::AEnemySpawner()
@@ -33,35 +35,8 @@ AEnemySpawner::AEnemySpawner()
 void AEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	SetActorLocation(GetActorLocation() - GetActorUpVector() * currentHeightLevel * VerticalMovementStride);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_DelayMovement, this, &AEnemySpawner::DelayMovmenet, DelayInterval + DelayDuration, true);
-
-	for (int i = 0; i < Column; i++)
-	{
-		DestroyedEnemiesPerColumn.Push(0);
-		ShootersIndex.Push(Row-1);
-	}
-
-	LeftBoxCurrentColumn = 1;
-	RightBoxCurrentColumn = Column;
-
-	for (auto& Enemy : Enemies)
-	{
-		Enemy->OnEnemyDestroyed.AddDynamic(this, &AEnemySpawner::OnEnemyDestroyed);
-	}
-
-
-	FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::FireAtPlayer);
-	GetWorldTimerManager().SetTimer(
-		TimerHandle_FireAtPlayer,
-		TimerDelagate,
-		FireRate,
-		true);
-
-	RemainingEnemyCount = Row * Column;
-	CurrentMovementSpeed = MovementSpeed;
+	InitializeSpawner();
 }
 
 // Called every frame
@@ -326,6 +301,7 @@ TObjectPtr<AEnemyBasePawn> AEnemySpawner::GetEnemy(int r, int c)
 void AEnemySpawner::FireAtPlayer()
 {
 	//TODO change the timer!?
+
 	int RandomEnemyColumn = FMath::RandRange(0, Column - 1);
 	int RandomEnemyRow = ShootersIndex[RandomEnemyColumn];
 	TObjectPtr<AEnemyBasePawn> enemy = GetEnemy(RandomEnemyRow, RandomEnemyColumn);
@@ -341,9 +317,114 @@ void AEnemySpawner::FireAtPlayer()
 
 }
 
+void AEnemySpawner::InitializeSpawner()
+{
+	SetActorLocation(GetActorLocation() - GetActorUpVector() * currentHeightLevel * VerticalMovementStride);
+
+	GetWorldTimerManager().SetTimer(
+		TimerHandle_DelayMovement,
+		this,
+		&AEnemySpawner::DelayMovmenet,
+		DelayInterval + DelayDuration,
+		true);
+
+	for (int i = 0; i < Column; i++)
+	{
+		DestroyedEnemiesPerColumn.Push(0);
+		ShootersIndex.Push(Row - 1);
+	}
+
+	LeftBoxCurrentColumn = 1;
+	RightBoxCurrentColumn = Column;
+
+	for (auto& Enemy : Enemies)
+	{
+		Enemy->OnEnemyDestroyed.AddDynamic(this, &AEnemySpawner::OnEnemyDestroyed);
+	}
+
+
+	FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::FireAtPlayer);
+	GetWorldTimerManager().SetTimer(
+		TimerHandle_FireAtPlayer,
+		TimerDelagate,
+		FireRate,
+		true);
+
+	RemainingEnemyCount = Row * Column;
+	CurrentMovementSpeed = MovementSpeed;
+
+	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
+	GBS->InitEnemiesLeft(RemainingEnemyCount);
+
+	ACoreGameMode* GameMode = Cast<ACoreGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	GameMode->SetSpawner(this);
+
+}
+
+void AEnemySpawner::ResetSpawner(int Level)
+{
+
+	//update the height and reset the location;
+	MovementDirection = EMovementDirection::Right;
+	currentHeightLevel = FMath::Clamp(Level, 0, maxHeightLevel);
+	SetActorLocation(FVector(150.f, 100.f, 1260.f));
+
+
+	SetActorLocation(GetActorLocation() - GetActorUpVector() * currentHeightLevel * VerticalMovementStride);
+
+	GetWorldTimerManager().SetTimer(
+		TimerHandle_DelayMovement,
+		this,
+		&AEnemySpawner::DelayMovmenet,
+		DelayInterval + DelayDuration,
+		true);
+
+	DestroyedEnemiesPerColumn.Empty();
+	ShootersIndex.Empty();
+	for (int i = 0; i < Column; i++)
+	{
+		DestroyedEnemiesPerColumn.Push(0);
+		ShootersIndex.Push(Row - 1);
+	}
+
+	// reset box colliders
+	LeftBoxCurrentColumn = 1;
+	RightBoxCurrentColumn = Column;
+
+	FVector StartPoint = -GetActorRightVector() * boxMarginToScreenEnd;
+	FVector EndPoint = GetActorRightVector() * (((Column - 1) * HorizontalStride) + boxMarginToScreenEnd);
+
+	LeftBoxComponent->SetRelativeLocation(StartPoint);
+	RightBoxComponent->SetRelativeLocation(EndPoint);
+
+	LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	RightBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+
+	FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::FireAtPlayer);
+	GetWorldTimerManager().SetTimer(
+		TimerHandle_FireAtPlayer,
+		TimerDelagate,
+		FireRate,
+		true);
+
+	RemainingEnemyCount = Row * Column;
+	CurrentMovementSpeed = MovementSpeed;
+
+	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
+	GBS->InitEnemiesLeft(RemainingEnemyCount);
+
+
+	for (auto& Enemy : Enemies)
+	{
+		Enemy->Reset();
+	}
+
+}
+
 void AEnemySpawner::UpdateMovementSpeed()
 {
-	float alpha = 1.f - ((float)RemainingEnemyCount / (float)((Row * Column) - 1)); // linear blend
+	float alpha = 1.f - ((float)(RemainingEnemyCount - 1) / (float)((Row * Column) - 1)); // linear blend
 
 	if (SpeedChangeRateCurve)
 	{

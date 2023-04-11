@@ -6,6 +6,8 @@
 #include "ProjectileBaseActor.h"
 #include "../GameComponents/Health/HealthComponent.h"	
 #include "../Launcher/ProjectileLauncher.h"
+#include "../Player/PlayerBaseController.h"
+#include "../Game/CoreGameState.h"
 
 // Sets default values
 AEnemyBasePawn::AEnemyBasePawn()
@@ -53,7 +55,7 @@ void AEnemyBasePawn::Shoot()
 void AEnemyBasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser)
 {
 	//TODO make this better (visually)
-
+	LastInstigator = InstigatedBy;
 	HealthComponent->DecreaseHealth(Damage);
 }
 
@@ -62,8 +64,28 @@ void AEnemyBasePawn::HealthBecomeZero(AActor* OwnerActor)
 	//TODO make this better (visually)
 	this->SetActorHiddenInGame(true);
 	this->SetActorEnableCollision(false);
-	this->SetActorLocation(FVector(0.f, -1000.f, 0.f));
+	//this->AddActorLocalOffset(FVector(0.f, -1000.f, 0.f));
 	this->SetEnemyEnable(false);
 
 	OnEnemyDestroyed.Broadcast(this);
+
+	// Add score to the last instigator
+
+	APlayerBaseController* PBC =  Cast<APlayerBaseController>(LastInstigator);
+	PBC->AddScore(PointsPerKill);
+	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
+	GBS->EnemyDestroyed();
+
+}
+
+void AEnemyBasePawn::Reset()
+{
+	Super::Reset();
+	this->SetActorHiddenInGame(false);
+	this->SetActorEnableCollision(true);
+	//this->AddActorLocalOffset(FVector(0.f, +1000.f, 0.f));
+	//this->SetActorLocation(FVector(0.f, 0.f, 0.f));
+	this->SetEnemyEnable(true);
+
+	HealthComponent->ResetHealth();
 }
