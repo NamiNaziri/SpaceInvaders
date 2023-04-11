@@ -4,6 +4,9 @@
 #include "CoreGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "CoreSaveGame.h"
+#include "Algo/BinarySearch.h"
+
+
 void UCoreGameInstance::Init()
 {
 	Super::Init();
@@ -40,7 +43,16 @@ void UCoreGameInstance::InitSaveFile()
 
 void UCoreGameInstance::AddToLeaderboard(FString PlayerName, float Score)
 {
-	Leaderboard.Push(FLeaderboardInfo(PlayerName, Score));
+	FLeaderboardInfo NewInfo = FLeaderboardInfo(PlayerName, Score);
+
+	// Binary seach to find index for the NewInfo. (We sort the leaderboard when loading from the save file.)
+	int32 IndexToInsert = Algo::LowerBound(Leaderboard, FLeaderboardInfo(PlayerName, Score),
+		[](const FLeaderboardInfo& Info1, const FLeaderboardInfo& Info2) {
+			return  Info1.Score > Info2.Score;
+		});
+
+	Leaderboard.Insert(NewInfo, IndexToInsert);
+
 	if (CoreSaveGame)
 	{
 		CoreSaveGame->SaveLeaderboard(SaveSlotName,FLeaderboardInfo(PlayerName, Score));
@@ -61,6 +73,10 @@ void UCoreGameInstance::OnLoadGameFromSlotFinished(const FString& SlotName, cons
 		if (CoreSaveGame)
 		{
 			CoreSaveGame->LoadLeaderboard(this->Leaderboard);
+			Leaderboard.Sort([](const FLeaderboardInfo& Info1, const FLeaderboardInfo& Info2) {
+				return  Info1.Score > Info2.Score;
+				});
+
 		}
 	}
 	else

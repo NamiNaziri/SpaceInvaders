@@ -66,4 +66,6 @@ protected:
 
 
 	void OnLoadGameFromSlotFinished(const FString& SlotName, const int32 UserIndex, USaveGame* SaveGame);
+
+	
 };
