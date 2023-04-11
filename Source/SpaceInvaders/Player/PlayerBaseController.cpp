@@ -7,17 +7,26 @@
 void APlayerBaseController::AddScore(float ScoreToAdd)
 {
 	APlayerBaseState* PS = GetPlayerState<APlayerBaseState>();
-	PS->AddScore(ScoreToAdd);
+	if (PS)
+	{
+		PS->AddScore(ScoreToAdd);
+	}
 }
 
 void APlayerBaseController::SetHealth(float Health)
 {
 	APlayerBaseState* PS = GetPlayerState<APlayerBaseState>();
-	PS->SetHealth(Health);
+	if (PS)
+	{
+		PS->SetHealth(Health);
+	}
 }
 
 void APlayerBaseController::SetMaxHealth(float MaxHealth)
 {
 	APlayerBaseState* PS = GetPlayerState<APlayerBaseState>();
-	PS->SetMaxHealth(MaxHealth);
+	if (PS)
+	{
+		PS->SetMaxHealth(MaxHealth);
+	}
 }

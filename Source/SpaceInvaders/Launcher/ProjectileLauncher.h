@@ -11,7 +11,7 @@ class AProjectileBaseActor;
 
 
 /*
-*	This class has a pool of projectile base actor and can launch a projectile.
+*	This class has a pool of projectile base actors and can launch a projectile.
 */
 
 UCLASS()

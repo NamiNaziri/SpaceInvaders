@@ -6,7 +6,10 @@
 #include "Engine/GameInstance.h"
 #include "CoreGameInstance.generated.h"
 
+// saving functionality is adopted from this toturial: https://www.youtube.com/watch?v=UsHuonij43o
 
+class UCoreSaveGame;
+class USaveGame;
 
 USTRUCT(BlueprintType)
 struct FLeaderboardInfo
@@ -39,6 +42,10 @@ class SPACEINVADERS_API UCoreGameInstance : public UGameInstance
 
 public:
 
+	virtual void Init() override;
+
+	void InitSaveFile();
+
 	UFUNCTION(BlueprintCallable)
 	void AddToLeaderboard(FString PlayerName, float Score);
 
@@ -48,5 +55,15 @@ public:
 
 protected:
 
+	UPROPERTY()
 	TArray<FLeaderboardInfo> Leaderboard;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Save")
+		FString SaveSlotName = "GameSlot0";
+
+	UPROPERTY()
+	TObjectPtr<UCoreSaveGame> CoreSaveGame;
+
+
+	void OnLoadGameFromSlotFinished(const FString& SlotName, const int32 UserIndex, USaveGame* SaveGame);
 };

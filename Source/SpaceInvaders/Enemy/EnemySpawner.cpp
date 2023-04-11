@@ -354,10 +354,16 @@ void AEnemySpawner::InitializeSpawner()
 	CurrentMovementSpeed = MovementSpeed;
 
 	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
-	GBS->InitEnemiesLeft(RemainingEnemyCount);
+	if (IsValid(GBS))
+	{
+		GBS->InitEnemiesLeft(RemainingEnemyCount);
+	}
 
 	ACoreGameMode* GameMode = Cast<ACoreGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	GameMode->SetSpawner(this);
+	if (IsValid(GameMode))
+	{
+		GameMode->SetSpawner(this);
+	}
 
 }
 

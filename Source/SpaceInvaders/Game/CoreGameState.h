@@ -38,11 +38,7 @@ protected:
 	UPROPERTY()
 		int EnemiesLeft = 0;
 
-
-
-
 	TEnumAsByte<EGameProgressionState> CurrentState;
-
 
 	void UpdateGameState();
 };

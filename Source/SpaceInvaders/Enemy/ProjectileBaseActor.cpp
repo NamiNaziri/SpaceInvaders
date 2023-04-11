@@ -6,6 +6,7 @@
 #include "Engine/DamageEvents.h"
 #include "Delegates/Delegate.h"
 #include <Components/BoxComponent.h>
+#include <Kismet/GameplayStatics.h>
 
 
 
@@ -63,6 +64,18 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 	* If the projectile still has collision, it can collide and kill an enemy while we are resetting the last enemy.
 	*/
 	PoolableObjectReleaseDelegate.Broadcast(this);
+
+	FTransform SpawnTransform = FTransform::Identity;
+	SpawnTransform.SetLocation(OtherActor->GetActorLocation());
+	SpawnTransform.SetRotation(GetActorRotation().Quaternion()); 
+
+	if (ExplosionParticleSystem)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleSystem, SpawnTransform);
+	}
+
+
+
 
 	// apply point damage
 	AController* EventInstigator = nullptr;
