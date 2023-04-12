@@ -75,9 +75,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = EnemySetting)
 		TArray<TObjectPtr<AEnemyBasePawn>> Enemies;
 
-	// Row index (starting from zero) for each shooter in the column. This array is the same size as the column.
-	// -1 means all enemies in the column are destroyed.
-	TArray<int32> ShootersIndex;
+	// Row and Column of active an available shooters. 
+	// <Key=Column, Value=Row>
+	TMap<int32, int32> ActiveShooters;
 	
 	TArray<int32> DestroyedEnemiesPerColumn;
 
@@ -121,9 +121,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
 		float VerticalMovementStride = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
 		int32 maxHeightLevel = 10;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
 		int32 currentHeightLevel = 0;
 
 	

@@ -104,6 +104,8 @@ void AEnemySpawner::LeftBoxOnOverlapBegin(UPrimitiveComponent* OverlappedCompone
 		return;
 	}
 	currentHeightLevel++;
+
+
 	SetMovementDirection(EMovementDirection::Down);
 	Direction *= -1;
 }
@@ -272,21 +274,20 @@ void AEnemySpawner::UpdateShooter(int EnemyIndex)
 {
 	int EnemyRow = (EnemyIndex / Column); // starting from 0
 	int EnemyColumn = (EnemyIndex % Column); // starting from 0
-
-	if (ShootersIndex[EnemyColumn] == EnemyRow)
+	
+	if (ActiveShooters[EnemyColumn] == EnemyRow)
 	{
 		for (int r = EnemyRow - 1; r >= 0; r--)
 		{
 			if (GetEnemy(r, EnemyColumn)->IsEnemyEnable())
 			{
-				ShootersIndex[EnemyColumn] = r;
+				ActiveShooters[EnemyColumn] = r;
 				return;
 			}
 		}
+		// all enmies from "EnemyColumn" are destroyed.
+		ActiveShooters.Remove(EnemyColumn);
 	}
-
-	ShootersIndex[EnemyColumn] = -1;
-
 }
 
 TObjectPtr<AEnemyBasePawn> AEnemySpawner::GetEnemy(int r, int c)
@@ -301,9 +302,13 @@ TObjectPtr<AEnemyBasePawn> AEnemySpawner::GetEnemy(int r, int c)
 void AEnemySpawner::FireAtPlayer()
 {
 	//TODO change the timer!?
+	TArray<int32> KeyArray;
+	ActiveShooters.GenerateKeyArray(KeyArray);
 
-	int RandomEnemyColumn = FMath::RandRange(0, Column - 1);
-	int RandomEnemyRow = ShootersIndex[RandomEnemyColumn];
+	int RandomIndex = FMath::RandRange(0, KeyArray.Num() - 1);
+
+	int RandomEnemyColumn = KeyArray[RandomIndex];
+	int RandomEnemyRow = ActiveShooters[RandomEnemyColumn];
 	TObjectPtr<AEnemyBasePawn> enemy = GetEnemy(RandomEnemyRow, RandomEnemyColumn);
 	if (enemy)
 	{
@@ -319,6 +324,8 @@ void AEnemySpawner::FireAtPlayer()
 
 void AEnemySpawner::InitializeSpawner()
 {
+
+	Direction = 1.f;
 	SetActorLocation(GetActorLocation() - GetActorUpVector() * currentHeightLevel * VerticalMovementStride);
 
 	GetWorldTimerManager().SetTimer(
@@ -331,7 +338,7 @@ void AEnemySpawner::InitializeSpawner()
 	for (int i = 0; i < Column; i++)
 	{
 		DestroyedEnemiesPerColumn.Push(0);
-		ShootersIndex.Push(Row - 1);
+		ActiveShooters.Emplace(i, Row - 1);
 	}
 
 	LeftBoxCurrentColumn = 1;
@@ -372,11 +379,14 @@ void AEnemySpawner::ResetSpawner(int Level)
 
 	//update the height and reset the location;
 	MovementDirection = EMovementDirection::Right;
+	Direction = 1.f;
 	currentHeightLevel = FMath::Clamp(Level, 0, maxHeightLevel);
 	SetActorLocation(FVector(150.f, 100.f, 1260.f));
 
 
 	SetActorLocation(GetActorLocation() - GetActorUpVector() * currentHeightLevel * VerticalMovementStride);
+
+	DelayMovmenet();
 
 	GetWorldTimerManager().SetTimer(
 		TimerHandle_DelayMovement,
@@ -386,11 +396,11 @@ void AEnemySpawner::ResetSpawner(int Level)
 		true);
 
 	DestroyedEnemiesPerColumn.Empty();
-	ShootersIndex.Empty();
+	ActiveShooters.Empty();
 	for (int i = 0; i < Column; i++)
 	{
 		DestroyedEnemiesPerColumn.Push(0);
-		ShootersIndex.Push(Row - 1);
+		ActiveShooters.Emplace(i, Row - 1);
 	}
 
 	// reset box colliders
