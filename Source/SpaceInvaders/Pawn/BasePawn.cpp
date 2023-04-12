@@ -3,10 +3,11 @@
 
 #include "BasePawn.h"
 #include <Components/BoxComponent.h>
-#include "../Enemy/ProjectileBaseActor.h"
-#include "../Launcher/ProjectileLauncher.h"
+#include "SpaceInvaders/Enemy/ProjectileBaseActor.h"
+#include "SpaceInvaders/Launcher/ProjectileLauncher.h"
 #include "Delegates/Delegate.h"
-#include "../GameComponents/Health/HealthComponent.h"
+#include "SpaceInvaders/GameComponents/Health/HealthComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ABasePawn::ABasePawn()
@@ -58,6 +59,12 @@ void ABasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AController*
 
 void ABasePawn::HealthBecomeZero(AActor* OwnerActor)
 {
+	if (ExplosionParticleSystem)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleSystem, GetActorTransform());
+	}
+
+
 }
 
 void ABasePawn::InitProjectileLauncher()

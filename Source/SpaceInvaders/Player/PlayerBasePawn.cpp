@@ -85,6 +85,8 @@ void APlayerBasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AContr
 void APlayerBasePawn::HealthBecomeZero(AActor* OwnerActor)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Player is dead"));
+
+	Super::HealthBecomeZero(OwnerActor);
 	APlayerBaseController* PBC = GetController<APlayerBaseController>();
 	PBC->RecieveOnDeath();
 }

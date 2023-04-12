@@ -4,10 +4,10 @@
 #include "EnemyBasePawn.h"
 #include <Components/BoxComponent.h>
 #include "ProjectileBaseActor.h"
-#include "../GameComponents/Health/HealthComponent.h"	
-#include "../Launcher/ProjectileLauncher.h"
-#include "../Player/PlayerBaseController.h"
-#include "../Game/CoreGameState.h"
+#include "SpaceInvaders/GameComponents/Health/HealthComponent.h"	
+#include "SpaceInvaders/Launcher/ProjectileLauncher.h"
+#include "SpaceInvaders/Player/PlayerBaseController.h"
+#include "SpaceInvaders/Game/CoreGameState.h"
 
 // Sets default values
 AEnemyBasePawn::AEnemyBasePawn()
@@ -61,13 +61,16 @@ void AEnemyBasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AContro
 
 void AEnemyBasePawn::HealthBecomeZero(AActor* OwnerActor)
 {
+
+	Super::HealthBecomeZero(OwnerActor);
+
 	//TODO make this better (visually)
+
+
 	this->SetActorHiddenInGame(true);
 	this->SetActorEnableCollision(false);
-	//this->AddActorLocalOffset(FVector(0.f, -1000.f, 0.f));
 	this->SetEnemyEnable(false);
 
-	OnEnemyDestroyed.Broadcast(this);
 
 	// Add score to the last instigator
 
@@ -76,6 +79,7 @@ void AEnemyBasePawn::HealthBecomeZero(AActor* OwnerActor)
 	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
 	GBS->EnemyDestroyed();
 
+	OnEnemyDestroyed.Broadcast(this);
 }
 
 void AEnemyBasePawn::Reset()

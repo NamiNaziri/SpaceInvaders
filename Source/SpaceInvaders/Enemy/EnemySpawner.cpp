@@ -304,21 +304,24 @@ void AEnemySpawner::FireAtPlayer()
 	//TODO change the timer!?
 	TArray<int32> KeyArray;
 	ActiveShooters.GenerateKeyArray(KeyArray);
-
-	int RandomIndex = FMath::RandRange(0, KeyArray.Num() - 1);
-
-	int RandomEnemyColumn = KeyArray[RandomIndex];
-	int RandomEnemyRow = ActiveShooters[RandomEnemyColumn];
-	TObjectPtr<AEnemyBasePawn> enemy = GetEnemy(RandomEnemyRow, RandomEnemyColumn);
-	if (enemy)
+	if (ActiveShooters.Num() > 0)
 	{
-		enemy->Shoot();
+		int RandomIndex = FMath::RandRange(0, KeyArray.Num() - 1);
+
+		int RandomEnemyColumn = KeyArray[RandomIndex];
+		int RandomEnemyRow = ActiveShooters[RandomEnemyColumn];
+		TObjectPtr<AEnemyBasePawn> enemy = GetEnemy(RandomEnemyRow, RandomEnemyColumn);
+		if (enemy)
+		{
+			enemy->Shoot();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("AEnemySpawner::FireAtPlayer -> index is not valid"));
+		}
+
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("AEnemySpawner::FireAtPlayer -> index is not valid"));
-	}
-	
+
 
 }
 
@@ -436,6 +439,13 @@ void AEnemySpawner::ResetSpawner(int Level)
 		Enemy->Reset();
 	}
 
+}
+
+void AEnemySpawner::PauseAllTimers()
+{
+	GetWorldTimerManager().PauseTimer(TimerHandle_DelayMovement);
+	GetWorldTimerManager().PauseTimer(TimerHandle_ResetMovement);
+	GetWorldTimerManager().PauseTimer(TimerHandle_FireAtPlayer);
 }
 
 void AEnemySpawner::UpdateMovementSpeed()

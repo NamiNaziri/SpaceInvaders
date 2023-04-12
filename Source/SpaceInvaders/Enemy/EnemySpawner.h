@@ -50,6 +50,8 @@ public:
 
 	void ResetSpawner(int Level);
 
+	void PauseAllTimers();
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)

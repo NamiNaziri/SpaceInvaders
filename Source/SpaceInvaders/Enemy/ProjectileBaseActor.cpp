@@ -63,15 +63,10 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 	* The problem with collision happens when resetting enemies. 
 	* If the projectile still has collision, it can collide and kill an enemy while we are resetting the last enemy.
 	*/
-	PoolableObjectReleaseDelegate.Broadcast(this);
-
-	FTransform SpawnTransform = FTransform::Identity;
-	SpawnTransform.SetLocation(OtherActor->GetActorLocation());
-	SpawnTransform.SetRotation(GetActorRotation().Quaternion()); 
 
 	if (ExplosionParticleSystem)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleSystem, SpawnTransform);
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleSystem, GetActorTransform());
 	}
 
 
@@ -94,6 +89,8 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 	OtherActor->TakeDamage(Damage, PDE, EventInstigator, this);
 	//TODO perfrom emitter and stuff
 
+
+	PoolableObjectReleaseDelegate.Broadcast(this);
 
 }
 
