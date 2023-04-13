@@ -10,6 +10,7 @@
 
 class UBoxComponent;
 class UProjectileMovementComponent;
+class AFieldSystemActor;
 
 UCLASS()
 class SPACEINVADERS_API AProjectileBaseActor : public AActor, public IPoolableObjectInterface
@@ -17,7 +18,7 @@ class SPACEINVADERS_API AProjectileBaseActor : public AActor, public IPoolableOb
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	// Sets default values for this actor's propertiesko
 	AProjectileBaseActor();
 
 protected:
@@ -45,6 +46,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AFieldSystemActor> MasterFieldClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		float Damage = 1.f;

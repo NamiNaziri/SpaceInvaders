@@ -97,7 +97,7 @@ void ACoreHUD::ShowLeaderboardEntryModel()
 {
 	ClearPlayerMainHud();
 	ClearFocusedWidget();
-	CurrentFocusedWidget = WBP_StartLevelCountdown;
+	CurrentFocusedWidget = WBP_LeaderboardEntryModal;
 	InitFocusedWidget();
 }
 

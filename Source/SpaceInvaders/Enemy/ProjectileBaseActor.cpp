@@ -7,7 +7,8 @@
 #include "Delegates/Delegate.h"
 #include <Components/BoxComponent.h>
 #include <Kismet/GameplayStatics.h>
-
+#include "Field/FieldSystemActor.h"
+#include "SpaceInvaders/Destructibles/DestructibleActor.h"
 
 
 // Sets default values
@@ -58,19 +59,35 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 	}
 	
 	
-	/*
-	* Before resetting the enemies that depend on the TakeDamage function, the projectile should be released in order to disable the collision.. 
-	* The problem with collision happens when resetting enemies. 
-	* If the projectile still has collision, it can collide and kill an enemy while we are resetting the last enemy.
-	*/
+
+
+
 
 	if (ExplosionParticleSystem)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleSystem, GetActorTransform());
 	}
 
+	ADestructibleActor* DestructibleActor = Cast<ADestructibleActor >(OtherActor);
+	if (DestructibleActor && MasterFieldClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		
+		// Spawn the actor
+		AFieldSystemActor* FieldSystemActor = GetWorld()->SpawnActor<AFieldSystemActor>(MasterFieldClass, SweepResult.ImpactPoint, GetActorRotation(), SpawnParams);
+		FieldSystemActor->SetLifeSpan(0.1f);
+	}
 
 
+	/*
+	* Before resetting the enemies that depend on the TakeDamage function, the projectile should be released in order to disable the collision..
+	* The problem with collision happens when resetting enemies.
+	* If the projectile still has collision, it can collide and kill an enemy while we are resetting the last enemy.
+	* also it should be after the particle and destroctible stuff since we need the current location of the projectile. (atleast for the emitter)
+	*/
+
+	PoolableObjectReleaseDelegate.Broadcast(this);
 
 	// apply point damage
 	AController* EventInstigator = nullptr;
@@ -86,11 +103,11 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 	
 
 	FPointDamageEvent PDE;
+	PDE.HitInfo = SweepResult;
 	OtherActor->TakeDamage(Damage, PDE, EventInstigator, this);
 	//TODO perfrom emitter and stuff
 
 
-	PoolableObjectReleaseDelegate.Broadcast(this);
 
 }
 
