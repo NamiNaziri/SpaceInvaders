@@ -37,12 +37,29 @@ void ABasePawn::BeginPlay()
 {
 	Super::BeginPlay();
 	InitProjectileLauncher();
+	PrevLocation = GetActorLocation();
+	InitMeshYaw = Mesh->GetRelativeRotation().Yaw;
 }
 
 // Called every frame
 void ABasePawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	FVector VelocityDirection = (GetActorLocation() - PrevLocation).GetSafeNormal();
+	float HorizontalDirection = VelocityDirection.Y;
+	// 270 is the 
+	float MeshTargetYaw = ( - 1 * HorizontalDirection * TargetAngleDifference) + InitMeshYaw;
+
+	FRotator MeshCurrentRotation = Mesh->GetRelativeRotation();
+	FRotator MeshTargetRotation = FRotator(MeshCurrentRotation.Pitch, MeshTargetYaw, MeshCurrentRotation.Roll);
+	FRotator MeshNewRotation = FMath::RInterpTo(MeshCurrentRotation, MeshTargetRotation, DeltaTime, MeshRotationRate);
+
+	Mesh->SetRelativeRotation(MeshNewRotation);
+
+	PrevLocation = GetActorLocation();
+
+
 
 }
 
@@ -69,16 +86,19 @@ void ABasePawn::HealthBecomeZero(AActor* OwnerActor)
 
 void ABasePawn::InitProjectileLauncher()
 {
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
+	if (ProjectileLauncherClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
 
-	// Spawn the actor
-	ProjectileLauncher = GetWorld()->SpawnActor<AProjectileLauncher>(
-		ProjectileLauncherClass,
-		GetActorLocation(),
-		GetActorRotation(),
-		SpawnParams);
-	if (ProjectileLauncher)
-		ProjectileLauncher->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		// Spawn the actor
+		ProjectileLauncher = GetWorld()->SpawnActor<AProjectileLauncher>(
+			ProjectileLauncherClass,
+			GetActorLocation(),
+			GetActorRotation(),
+			SpawnParams);
+		if (ProjectileLauncher)
+			ProjectileLauncher->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	}
 }
 

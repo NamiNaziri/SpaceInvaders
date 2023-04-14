@@ -76,15 +76,13 @@ void AEnemyBasePawn::HealthBecomeZero(AActor* OwnerActor)
 
 	APlayerBaseController* PBC =  Cast<APlayerBaseController>(LastInstigator);
 	PBC->AddScore(PointsPerKill);
-	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
-	GBS->EnemyDestroyed();
+
 
 	OnEnemyDestroyed.Broadcast(this);
 }
 
-void AEnemyBasePawn::Reset()
+void AEnemyBasePawn::ResetEnemy()
 {
-	Super::Reset();
 	this->SetActorHiddenInGame(false);
 	this->SetActorEnableCollision(true);
 	//this->AddActorLocalOffset(FVector(0.f, +1000.f, 0.f));

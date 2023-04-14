@@ -37,7 +37,7 @@ class SPACEINVADERS_API AEnemySpawner : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AEnemySpawner();
-
+	~AEnemySpawner();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -52,30 +52,40 @@ public:
 
 	void PauseAllTimers();
 
+	void SetEdgeScreenCollision(bool bEnable);
+
+	void SetEnemiesCanShoot(bool bCanShoot);
+
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
 		int32 Row = 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
 		int32 Column= 2;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
 		float HorizontalStride = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
 		float VerticalStride = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = SpawnerSetting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
 		float boxMarginToScreenEnd = 1.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
+		bool bShouldRegisterToGameState = true;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = EnemySetting)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Enemy")
 		TArray<TSubclassOf<AEnemyBasePawn>> EnemyType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = EnemySetting)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Enemy")
 		TArray<TObjectPtr<AEnemyBasePawn>> Enemies;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Enemy")
+		bool bEnemiesCanShoot = true;
 
 	// Row and Column of active an available shooters. 
 	// <Key=Column, Value=Row>
@@ -89,30 +99,30 @@ protected:
 	int RemainingEnemyCount;
 
 	/*Base movement speed */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float MovementSpeed = 400.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 	/*Current Movement Speed*/
 	float CurrentMovementSpeed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float MaxMovementSpeed = 1000.f;
 	/*
 	* This curve needs to be normalized between zero and one, as it will determine how the speed increases when an enemy is destroyed.
 	* If the curve does not exist, a linear rate will be applied instead.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		UCurveFloat* SpeedChangeRateCurve;
 
 	// wait after every DelayInterval(seconds)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float DelayInterval = 1.f;
 
 
 
 	// after the delay interval is reached, wait for DelayDuration(seconds)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float DelayDuration = 1.f;
 
 
@@ -120,17 +130,18 @@ protected:
 
 	FTimerHandle TimerHandle_ResetMovement;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float VerticalMovementStride = 5;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
-		int32 maxHeightLevel = 10;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = Movement)
-		int32 currentHeightLevel = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
+		int32 MaxHeightLevel = 10;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
+		int32 CurrentHeightLevel = 0;
 
 	
 	// Rate at which a weapon can fire projectiles. 1 shot per second.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Shooting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Spawner|Enemy")
 		float FireRate = 1.f;
 
 	FTimerHandle TimerHandle_FireAtPlayer;
@@ -146,6 +157,8 @@ protected:
 	TEnumAsByte<EMovementDirection> MovementDirection = EMovementDirection::Right;
 
 	TEnumAsByte<EEnemyMovementMode> MovementMode = EEnemyMovementMode::Freezed;
+
+
 
 
 	UFUNCTION(BlueprintCallable)

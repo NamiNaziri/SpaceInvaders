@@ -37,7 +37,8 @@ public:
 	UFUNCTION()
 		void Shoot();
 
-	virtual void Reset() override;
+	/* The use of the built-in reset function resulted in problems, notably the unintended destruction of actors. */
+	void ResetEnemy();
 
 protected:
 

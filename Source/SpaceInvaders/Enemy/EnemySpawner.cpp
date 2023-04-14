@@ -31,6 +31,11 @@ AEnemySpawner::AEnemySpawner()
 	
 }
 
+AEnemySpawner::~AEnemySpawner()
+{
+	DestroyAllEnemies();
+}
+
 // Called when the game starts or when spawned
 void AEnemySpawner::BeginPlay()
 {
@@ -92,7 +97,7 @@ void AEnemySpawner::RightBoxOnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 	{
 		return;
 	}
-	currentHeightLevel++;
+	CurrentHeightLevel++;
 	SetMovementDirection(EMovementDirection::Down);
 	Direction *= -1;
 }
@@ -103,7 +108,7 @@ void AEnemySpawner::LeftBoxOnOverlapBegin(UPrimitiveComponent* OverlappedCompone
 	{
 		return;
 	}
-	currentHeightLevel++;
+	CurrentHeightLevel++;
 
 
 	SetMovementDirection(EMovementDirection::Down);
@@ -133,7 +138,7 @@ void AEnemySpawner::Move(float DeltaTime)
 			break;
 
 		case EMovementDirection::Down:
-			if (currentHeightLevel <= maxHeightLevel)
+			if (CurrentHeightLevel <= MaxHeightLevel)
 			{
 				SetActorLocation(CurrentLocation - GetActorUpVector() * VerticalMovementStride);
 
@@ -165,13 +170,25 @@ void AEnemySpawner::SpawnAnEnemy(int EnemyTypeIndex, FVector SpawnLocation, FRot
 {
 	if (EnemyType.IsValidIndex(EnemyTypeIndex))
 	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
-		
-		// Spawn the actor
-		AEnemyBasePawn* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBasePawn>(EnemyType[EnemyTypeIndex], SpawnLocation, SpawnRotation, SpawnParams);
-		Enemies.Push(SpawnedEnemy);
-		SpawnedEnemy->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		if (EnemyType[EnemyTypeIndex])
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+
+			// Spawn the actor
+			AEnemyBasePawn* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBasePawn>(EnemyType[EnemyTypeIndex], SpawnLocation, SpawnRotation, SpawnParams);
+			if (SpawnedEnemy)
+			{
+
+				Enemies.Push(SpawnedEnemy);
+				SpawnedEnemy->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("AEnemySpawner::SpawnAnEnemy: Enemy did not spawned"));
+			}
+		}
+
 	}
 	
 }
@@ -212,6 +229,12 @@ void AEnemySpawner::OnEnemyDestroyed(AEnemyBasePawn* Enemy)
 	UpdateEdgeScreenBoxes(Index);
 	UpdateShooter(Index);
 	UpdateMovementSpeed();
+
+	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
+	if (bShouldRegisterToGameState && IsValid(GBS))
+	{
+		GBS->EnemyDestroyed();
+	}
 }
 
 void AEnemySpawner::UpdateEdgeScreenBoxes(int EnemyIndex)
@@ -301,6 +324,11 @@ TObjectPtr<AEnemyBasePawn> AEnemySpawner::GetEnemy(int r, int c)
 
 void AEnemySpawner::FireAtPlayer()
 {
+	if (!bEnemiesCanShoot)
+	{
+		return;
+	}
+
 	//TODO change the timer!?
 	TArray<int32> KeyArray;
 	ActiveShooters.GenerateKeyArray(KeyArray);
@@ -327,9 +355,11 @@ void AEnemySpawner::FireAtPlayer()
 
 void AEnemySpawner::InitializeSpawner()
 {
-
+	MovementDirection = EMovementDirection::Right;
 	Direction = 1.f;
-	SetActorLocation(GetActorLocation() - GetActorUpVector() * currentHeightLevel * VerticalMovementStride);
+	SetActorLocation(GetActorLocation() - GetActorUpVector() * CurrentHeightLevel * VerticalMovementStride);
+
+	DelayMovmenet();
 
 	GetWorldTimerManager().SetTimer(
 		TimerHandle_DelayMovement,
@@ -346,6 +376,21 @@ void AEnemySpawner::InitializeSpawner()
 
 	LeftBoxCurrentColumn = 1;
 	RightBoxCurrentColumn = Column;
+
+	FVector StartPoint = -GetActorRightVector() * boxMarginToScreenEnd;
+	FVector EndPoint = GetActorRightVector() * (((Column - 1) * HorizontalStride) + boxMarginToScreenEnd);
+
+	LeftBoxComponent->SetRelativeLocation(StartPoint);
+	RightBoxComponent->SetRelativeLocation(EndPoint);
+
+	LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	RightBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	if (LeftBoxCurrentColumn == RightBoxCurrentColumn)
+	{
+		LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
 
 	for (auto& Enemy : Enemies)
 	{
@@ -364,15 +409,9 @@ void AEnemySpawner::InitializeSpawner()
 	CurrentMovementSpeed = MovementSpeed;
 
 	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
-	if (IsValid(GBS))
+	if (bShouldRegisterToGameState && IsValid(GBS))
 	{
 		GBS->InitEnemiesLeft(RemainingEnemyCount);
-	}
-
-	ACoreGameMode* GameMode = Cast<ACoreGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode))
-	{
-		GameMode->SetSpawner(this);
 	}
 
 }
@@ -383,11 +422,9 @@ void AEnemySpawner::ResetSpawner(int Level)
 	//update the height and reset the location;
 	MovementDirection = EMovementDirection::Right;
 	Direction = 1.f;
-	currentHeightLevel = FMath::Clamp(Level, 0, maxHeightLevel);
-	SetActorLocation(FVector(150.f, 100.f, 1260.f));
+	CurrentHeightLevel = FMath::Clamp(Level, 0, MaxHeightLevel);
 
-
-	SetActorLocation(GetActorLocation() - GetActorUpVector() * currentHeightLevel * VerticalMovementStride);
+	SetActorLocation(GetActorLocation() - GetActorUpVector() * CurrentHeightLevel * VerticalMovementStride);
 
 	DelayMovmenet();
 
@@ -419,6 +456,11 @@ void AEnemySpawner::ResetSpawner(int Level)
 	LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	RightBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
+	if (LeftBoxCurrentColumn == RightBoxCurrentColumn)
+	{
+		LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
 
 	FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::FireAtPlayer);
 	GetWorldTimerManager().SetTimer(
@@ -430,15 +472,17 @@ void AEnemySpawner::ResetSpawner(int Level)
 	RemainingEnemyCount = Row * Column;
 	CurrentMovementSpeed = MovementSpeed;
 
+
 	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
-	GBS->InitEnemiesLeft(RemainingEnemyCount);
-
-
+	if (bShouldRegisterToGameState && IsValid(GBS))
+	{
+		GBS->InitEnemiesLeft(RemainingEnemyCount);
+	}
+	
 	for (auto& Enemy : Enemies)
 	{
-		Enemy->Reset();
+		Enemy->ResetEnemy();
 	}
-
 }
 
 void AEnemySpawner::PauseAllTimers()
@@ -446,6 +490,29 @@ void AEnemySpawner::PauseAllTimers()
 	GetWorldTimerManager().PauseTimer(TimerHandle_DelayMovement);
 	GetWorldTimerManager().PauseTimer(TimerHandle_ResetMovement);
 	GetWorldTimerManager().PauseTimer(TimerHandle_FireAtPlayer);
+}
+
+void AEnemySpawner::SetEdgeScreenCollision(bool bEnable)
+{
+	if (bEnable)
+	{
+		LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		RightBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		if (LeftBoxCurrentColumn == RightBoxCurrentColumn)
+		{
+			LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+	}
+	else
+	{
+		LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		RightBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void AEnemySpawner::SetEnemiesCanShoot(bool bCanShoot)
+{
+	bEnemiesCanShoot = bCanShoot;
 }
 
 void AEnemySpawner::UpdateMovementSpeed()
