@@ -1,0 +1,11 @@
+Model Information:
+* title:	Asteroid: Ceres
+* source:	https://sketchfab.com/3d-models/asteroid-ceres-f57c49e7eb90439c97064d2ddea09d25
+* author:	Ignazio Pillitteri (https://sketchfab.com/gnaz)
+
+Model License:
+* license type:	CC-BY-ND-4.0 (http://creativecommons.org/licenses/by-nd/4.0/)
+* requirements:	Author must be credited. Modified versions can not be distributed. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Asteroid: Ceres" (https://sketchfab.com/3d-models/asteroid-ceres-f57c49e7eb90439c97064d2ddea09d25) by Ignazio Pillitteri (https://sketchfab.com/gnaz) licensed under CC-BY-ND-4.0 (http://creativecommons.org/licenses/by-nd/4.0/)

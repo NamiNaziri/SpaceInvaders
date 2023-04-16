@@ -3,11 +3,15 @@
 
 #include "EnemyBasePawn.h"
 #include <Components/BoxComponent.h>
+#include "Engine/DamageEvents.h"
 #include "ProjectileBaseActor.h"
 #include "SpaceInvaders/GameComponents/Health/HealthComponent.h"	
 #include "SpaceInvaders/Launcher/ProjectileLauncher.h"
 #include "SpaceInvaders/Player/PlayerBaseController.h"
 #include "SpaceInvaders/Game/CoreGameState.h"
+#include <SpaceInvaders/Destructibles/DestructibleActor.h>
+
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyBasePawn::AEnemyBasePawn()
@@ -17,6 +21,9 @@ AEnemyBasePawn::AEnemyBasePawn()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Scene Component"));
 	Super::BoxComponent->SetupAttachment(RootComponent);
 
+
+
+	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemyBasePawn::OnBoxBeginOverlap);
 }
 
 // Called when the game starts or when spawned
@@ -61,33 +68,62 @@ void AEnemyBasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AContro
 
 void AEnemyBasePawn::HealthBecomeZero(AActor* OwnerActor)
 {
+	if (IsEnemyEnable())
+	{
+		Super::HealthBecomeZero(OwnerActor);
 
-	Super::HealthBecomeZero(OwnerActor);
+		//TODO make this better (visually)
 
-	//TODO make this better (visually)
+		this->SetActorHiddenInGame(true);
+		this->SetActorEnableCollision(false);
+		this->SetEnemyEnable(false);
+		BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+		// Add score to the last instigator if exist
+		APlayerBaseController* PBC = Cast<APlayerBaseController>(LastInstigator);
+		if (PBC)
+		{
+			PBC->AddScore(PointsPerKill);
+		}
 
-	this->SetActorHiddenInGame(true);
-	this->SetActorEnableCollision(false);
-	this->SetEnemyEnable(false);
+		SetEnemyEnable(false);
 
+		if (ExplosionSoundCue)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), ExplosionSoundCue);
+		}
 
-	// Add score to the last instigator
+		OnEnemyDestroyed.Broadcast(this);
+	}
 
-	APlayerBaseController* PBC =  Cast<APlayerBaseController>(LastInstigator);
-	PBC->AddScore(PointsPerKill);
+}
 
+void AEnemyBasePawn::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
 
-	OnEnemyDestroyed.Broadcast(this);
+	if (OtherActor == this || OtherActor == GetOwner())
+	{
+		return;
+	}
+
+	ADestructibleActor* DestructibleActor = Cast<ADestructibleActor >(OtherActor);
+	if (DestructibleActor)
+	{
+		FPointDamageEvent PDE;
+		PDE.HitInfo = SweepResult;
+		OtherActor->TakeDamage(1000000.f, PDE, nullptr, this); // make sure that the destructible actor will die.
+
+		// Destroy self.
+		HealthBecomeZero(this);
+	}
 }
 
 void AEnemyBasePawn::ResetEnemy()
 {
 	this->SetActorHiddenInGame(false);
 	this->SetActorEnableCollision(true);
-	//this->AddActorLocalOffset(FVector(0.f, +1000.f, 0.f));
-	//this->SetActorLocation(FVector(0.f, 0.f, 0.f));
 	this->SetEnemyEnable(true);
-
+	BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	SetEnemyEnable(true);
 	HealthComponent->ResetHealth();
 }

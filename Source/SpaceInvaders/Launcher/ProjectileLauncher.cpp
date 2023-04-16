@@ -34,7 +34,7 @@ void AProjectileLauncher::Tick(float DeltaTime)
 
 }
 
-void AProjectileLauncher::Launch(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed)
+bool AProjectileLauncher::Launch(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed)
 {
 	if (Speed >= 0)
 	{
@@ -53,7 +53,10 @@ void AProjectileLauncher::Launch(FVector Location, FRotator Rotation, FVector La
 			LaunchDirection *= PMC->InitialSpeed;
 			PMC->Velocity = LaunchDirection;
 		}
+		return true;
 	}
+
+	return false;
 }
 
 TObjectPtr<UObjectPoolComponent> AProjectileLauncher::GetPoolComponent()

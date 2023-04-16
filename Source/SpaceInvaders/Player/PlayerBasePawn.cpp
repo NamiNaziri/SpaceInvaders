@@ -9,7 +9,7 @@
 #include "Engine/GameEngine.h"
 
 #include <Components/BoxComponent.h>
-
+#include "Kismet/GameplayStatics.h"
 #include <GameFramework/PawnMovementComponent.h>
 #include <GameFramework/FloatingPawnMovement.h>
 
@@ -22,7 +22,6 @@
 // Sets default values
 APlayerBasePawn::APlayerBasePawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>(TEXT("Pawn Movement"));
@@ -78,24 +77,38 @@ void APlayerBasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AContr
 	UE_LOG(LogTemp, Warning, TEXT("Player took damage"));
 
 	HealthComponent->DecreaseHealth(Damage);
-	APlayerBaseController* PBC = GetController<APlayerBaseController>();
-	PBC->SetHealth(HealthComponent->GetCurrentHealth());
+
+	/* Notify the player state of the updated health. */
+	TObjectPtr<APlayerBaseController> PBC = GetController<APlayerBaseController>();
+	if (PBC)
+	{
+		PBC->SetHealth(HealthComponent->GetCurrentHealth());
+	}
+	
+
+	if (ImpactSoundCue)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ImpactSoundCue);
+	}
 }
 
 void APlayerBasePawn::HealthBecomeZero(AActor* OwnerActor)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Player is dead"));
-
 	Super::HealthBecomeZero(OwnerActor);
+
+	/* Controller handles player's death*/
 	APlayerBaseController* PBC = GetController<APlayerBaseController>();
-	PBC->RecieveOnDeath();
+	if (PBC)
+	{
+		PBC->RecieveOnDeath();
+	}
+	
 }
 
 void APlayerBasePawn::Move(const FInputActionInstance& Instance)
 {
 
 	FVector2D MoveInput = Instance.GetValue().Get<FVector2D>();
-
 
 	AddMovementInput(GetActorRightVector(), -1 * MoveInput.X * MovementSpeed);
 
@@ -125,7 +138,11 @@ void APlayerBasePawn::Shoot(const FInputActionInstance& Instance)
 			return;
 
 		FVector ProjectileLocation = GetActorLocation() + GetActorUpVector() * BoxComponent->GetScaledBoxExtent().Z;
-		ProjectileLauncher->Launch(ProjectileLocation, GetActorRotation(), GetActorUpVector(), -1.f);
+		bool bSuccess = ProjectileLauncher->Launch(ProjectileLocation, GetActorRotation(), GetActorUpVector(), -1.f);
+		if (bSuccess)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), ShootingSoundCue);
+		}
 	}
 	
 }
@@ -140,6 +157,7 @@ void APlayerBasePawn::InitProjectileLauncher()
 {
 	Super::InitProjectileLauncher();
 
+	/* When using a projectile-based firing rate, the object pool should not create new objects once it has run out of available ones. */
 	if (FireRateMode == EFireRateMode::AvailabilityBased)
 	{
 		ProjectileLauncher->GetPoolComponent()->SetShouldCreateNew(false);

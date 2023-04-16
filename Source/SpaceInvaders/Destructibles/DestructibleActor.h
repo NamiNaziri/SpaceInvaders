@@ -46,11 +46,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category="FieldSystem|Anchor")
 		TObjectPtr<AFieldSystemActor> AnchorField;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		//TSubclassOf<AFieldSystemActor> AnchorFieldClass;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category="FieldSystem|Damage")
 		TSubclassOf<AFieldSystemActor> SelfDestructionDamageClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Visual|Particle")
+		TObjectPtr<UParticleSystem> DestructionParticleSystem;
 
 	UFUNCTION()
 		virtual void TakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);

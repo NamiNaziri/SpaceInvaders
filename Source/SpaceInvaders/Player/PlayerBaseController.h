@@ -6,8 +6,10 @@
 #include "GameFramework/PlayerController.h"
 #include "PlayerBaseController.generated.h"
 
-/**
- * 
+/*
+ *	Player controller handles overal state of the player pawn.
+ *	Communicate with other core classes such as player state and HUD class.
+ *  Handles non-gamplay inputs such as pausing and show the related HUD based on them.
  */
 UCLASS()
 class SPACEINVADERS_API APlayerBaseController : public APlayerController
@@ -16,11 +18,16 @@ class SPACEINVADERS_API APlayerBaseController : public APlayerController
 
 public:
 
-	void AddScore(float ScoreToAdd);
-	void SetHealth(float Health);
-	void SetMaxHealth(float MaxHealth);
+	UFUNCTION()
+		void AddScore(float ScoreToAdd);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Death")
+	UFUNCTION()
+		void SetHealth(float Health);
+
+	UFUNCTION()
+		void SetMaxHealth(float MaxHealth);
+
+	UFUNCTION()
 		void RecieveOnDeath();
 	
 };

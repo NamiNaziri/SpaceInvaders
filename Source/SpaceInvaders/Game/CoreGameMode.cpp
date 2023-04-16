@@ -7,6 +7,13 @@
 #include "SpaceInvaders/Player/PlayerBaseController.h"
 #include "SpaceInvaders/Game/CoreHUD.h"
 #include "SpaceInvaders/Game/SpawnLocationActor.h"
+#include "Components/AudioComponent.h"
+#include "SpaceInvaders/Enemy/EnemyBasePawn.h"
+
+ACoreGameMode::ACoreGameMode()
+{
+	//AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio component"));
+}
 
 void ACoreGameMode::StartPlay()
 {
@@ -45,6 +52,7 @@ void ACoreGameMode::AdvanceLevel()
 {
 	this->Level++;
 	
+	
 	if (EnemySpawner)
 	{
 		EnemySpawner->PauseAllTimers();
@@ -61,6 +69,7 @@ void ACoreGameMode::StartNewLevel()
 	if (RemainingTime == 0)
 	{
 		GetWorldTimerManager().ClearTimer(TimerHandle_StartNewLevel);
+		OnLevelAdvanced.Broadcast(Level);
 		
 		if (EnemySpawner)
 		{
@@ -95,6 +104,17 @@ void ACoreGameMode::SpawnUFO()
 		GetWorldTimerManager().SetTimer(TimerHandle_DestoryUFO, this, &ACoreGameMode::DestoryUFO, UFOLifeSpan, false);
 		GetWorldTimerManager().SetTimer(TimerHandle_UFOCollisionDisable, this, &ACoreGameMode::OnUFOCollisionDisable, UFOColisionDisableDelay, false);
 		
+		if (UFOSpawner)
+		{
+			const TArray<TObjectPtr<AEnemyBasePawn>> UFOEnemyList = UFOSpawner->GetEnemies();
+			if (UFOEnemyList.IsValidIndex(0))
+			{
+				// bind an event so we know when the ufo is destroyed by the player.
+				UFOEnemyList[0]->OnEnemyDestroyed.AddDynamic(this, &ACoreGameMode::OnUFOPawnDestroyed);
+			}
+		}
+		
+		UFOAudioComponent = UGameplayStatics::SpawnSound2D(GetWorld(), UFOSoundCue);
 		// todo set other spawner related stuff;
 	}
 }
@@ -105,13 +125,35 @@ void ACoreGameMode::DestoryUFO()
 	{
 		GetWorldTimerManager().SetTimer(TimerHandle_SpawnUFO, this, &ACoreGameMode::SpawnUFO, UFOSpawnInterval, false);
 		UFOSpawner->SetEdgeScreenCollision(false);
-		UFOSpawner->SetLifeSpan(3.f);
+		UFOSpawner->SetLifeSpan(7.f);
+		if (UFOAudioComponent)
+		{
+			UFOAudioComponent->StopDelayed(1.f);
+		}
 	}
 }
 
 void ACoreGameMode::OnUFOCollisionDisable()
 {
 	UFOSpawner->SetEdgeScreenCollision(true);
+}
+
+void ACoreGameMode::OnUFOPawnDestroyed(AEnemyBasePawn* Enemy)
+{
+	if (UFOAudioComponent)
+	{
+		UFOAudioComponent->Stop();
+	}
+}
+
+void ACoreGameMode::PlayerDied()
+{
+	if (UFOAudioComponent)
+	{
+		UFOAudioComponent->Stop();
+	}
+
+	UGameplayStatics::PlaySound2D(GetWorld(), GameOverSoundCue);
 }
 
 

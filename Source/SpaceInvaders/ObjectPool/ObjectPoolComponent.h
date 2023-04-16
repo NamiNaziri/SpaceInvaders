@@ -6,6 +6,13 @@
 #include "Components/ActorComponent.h"
 #include "ObjectPoolComponent.generated.h"
 
+/*
+*	The pool component is used for pooling pattern. 
+*	Pooling is currently not required in the game's current state. 
+*	However, if we plan to introduce additional flying projectiles later on, it will become a necessary functionality.
+*	
+*	The pool component works closely with PoolableObjectInterface.
+*/
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEINVADERS_API UObjectPoolComponent : public UActorComponent
@@ -37,6 +44,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Settings")
 		TSubclassOf<AActor> ClassToSpawn;
 
+	/* Initial pool capacity*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Settings")
 		int PoolCapacity = 1;
 
@@ -53,6 +61,7 @@ protected:
 
 
 	UFUNCTION()
-	void SpawnObjects(int num);
+		void SpawnObjects(int num);
+
 	TObjectPtr<AActor> SpawnSingleObject();
 };

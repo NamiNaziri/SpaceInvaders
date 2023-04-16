@@ -8,6 +8,7 @@
 #include <Components/BoxComponent.h>
 
 #include "SpaceInvaders/GameComponents/Health/HealthComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ADestructibleActor::ADestructibleActor()
@@ -82,6 +83,11 @@ float ADestructibleActor::GetRemainingHealth()
 
 void ADestructibleActor::TakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser)
 {
+
+	if (DestructionParticleSystem)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DestructionParticleSystem, HitLocation,GetActorRotation());
+	}
 
 	FVector NewBoxExtent = BoxComponent->GetUnscaledBoxExtent();
 	NewBoxExtent.Z -= BoxAdjustmentOffset;

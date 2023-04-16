@@ -31,16 +31,11 @@ AEnemySpawner::AEnemySpawner()
 	
 }
 
-AEnemySpawner::~AEnemySpawner()
-{
-	DestroyAllEnemies();
-}
-
 // Called when the game starts or when spawned
 void AEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
-
+	FlushPersistentDebugLines(GetWorld());
 	InitializeSpawner();
 }
 
@@ -55,30 +50,7 @@ void AEnemySpawner::Tick(float DeltaTime)
 
 void AEnemySpawner::OnConstruction(const FTransform& Transform)
 {
-	FVector StartPoint = - GetActorRightVector() * boxMarginToScreenEnd;
-	FVector EndPoint = GetActorRightVector() * (((Column - 1) * HorizontalStride) + boxMarginToScreenEnd);
-	//FVector LeftBoxExtent;
-
-	FlushPersistentDebugLines(GetWorld());
-
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 10.f, 12, FColor::Red, true);
-
-	LeftBoxComponent->SetRelativeLocation(StartPoint);
-	RightBoxComponent->SetRelativeLocation(EndPoint);
-	DestroyAllEnemies();
-	for (int i = 0; i < Row; i++)
-	{
-		int EnemyTypeIndex = FMath::RandRange(0, EnemyType.Num() - 1);
-		for (int j = 0; j < Column; j++)
-		{
-			FVector Center = GetActorLocation();
-			Center += GetActorRightVector() * j * HorizontalStride;
-			Center -= GetActorUpVector() * i * VerticalStride;
-			DrawDebugBox(GetWorld(), Center, FVector(50.f, 50.f, 50.f), FColor::Blue, true);
-			SpawnAnEnemy(EnemyTypeIndex, Center, GetActorRotation());
-		}
-	}
-
+	//SpawnAllEnemies();
 }
 
 void AEnemySpawner::SetMovementDirection(TEnumAsByte<EMovementDirection> NewMovementDirection)
@@ -168,15 +140,15 @@ void AEnemySpawner::Move(float DeltaTime)
 
 void AEnemySpawner::SpawnAnEnemy(int EnemyTypeIndex, FVector SpawnLocation, FRotator SpawnRotation)
 {
-	if (EnemyType.IsValidIndex(EnemyTypeIndex))
+	if (EnemyClass.IsValidIndex(EnemyTypeIndex))
 	{
-		if (EnemyType[EnemyTypeIndex])
+		if (EnemyClass[EnemyTypeIndex])
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
 
 			// Spawn the actor
-			AEnemyBasePawn* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBasePawn>(EnemyType[EnemyTypeIndex], SpawnLocation, SpawnRotation, SpawnParams);
+			AEnemyBasePawn* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBasePawn>(EnemyClass[EnemyTypeIndex], SpawnLocation, SpawnRotation, SpawnParams);
 			if (SpawnedEnemy)
 			{
 
@@ -359,6 +331,10 @@ void AEnemySpawner::InitializeSpawner()
 	Direction = 1.f;
 	SetActorLocation(GetActorLocation() - GetActorUpVector() * CurrentHeightLevel * VerticalMovementStride);
 
+	/*
+	*	Spawner starts at freeze state. by calling the Delay movement it would wait for DelayDuration and the changes the 
+	*	Movement mode to normal. This way, we can achieve a non-timer based movement by setting the DelayInterval to a high numebr.
+	*/
 	DelayMovmenet();
 
 	GetWorldTimerManager().SetTimer(
@@ -374,6 +350,41 @@ void AEnemySpawner::InitializeSpawner()
 		ActiveShooters.Emplace(i, Row - 1);
 	}
 
+	/* Adjust edge screen collision boxes */
+
+	InitializeEdgeScreenBoxes();
+
+	/* Spawn Enemies*/
+	SpawnAllEnemies();
+
+	for (auto& Enemy : Enemies)
+	{
+		Enemy->OnEnemyDestroyed.AddDynamic(this, &AEnemySpawner::OnEnemyDestroyed);
+	}
+
+	/* Set timer for fire rate*/
+	FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::FireAtPlayer);
+	GetWorldTimerManager().SetTimer(
+		TimerHandle_FireAtPlayer,
+		TimerDelagate,
+		FireRate,
+		true);
+
+
+	RemainingEnemyCount = Row * Column;
+	CurrentMovementSpeed = MovementSpeed;
+
+	/* Register enemy count to the game state. */
+	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
+	if (bShouldRegisterToGameState && IsValid(GBS))
+	{
+		GBS->InitEnemiesLeft(RemainingEnemyCount);
+	}
+
+}
+
+void AEnemySpawner::InitializeEdgeScreenBoxes()
+{
 	LeftBoxCurrentColumn = 1;
 	RightBoxCurrentColumn = Column;
 
@@ -390,34 +401,54 @@ void AEnemySpawner::InitializeSpawner()
 	{
 		LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
 
+void AEnemySpawner::SpawnAllEnemies()
+{
 
-	for (auto& Enemy : Enemies)
+	FVector StartPoint = -GetActorRightVector() * boxMarginToScreenEnd;
+	FVector EndPoint = GetActorRightVector() * (((Column - 1) * HorizontalStride) + boxMarginToScreenEnd);
+
+	FlushPersistentDebugLines(GetWorld());
+
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), 10.f, 12, FColor::Red, true);
+
+	LeftBoxComponent->SetRelativeLocation(StartPoint);
+	RightBoxComponent->SetRelativeLocation(EndPoint);
+	DestroyAllEnemies();
+	for (int i = 0; i < Row; i++)
 	{
-		Enemy->OnEnemyDestroyed.AddDynamic(this, &AEnemySpawner::OnEnemyDestroyed);
+		int EnemyTypeIndex = 0;
+		if (EnemySpawnMode == EEnemySpawnMode::Row_Random)
+		{
+			EnemyTypeIndex = FMath::RandRange(0, EnemyClass.Num() - 1);
+		}
+		else if (EnemySpawnMode == EEnemySpawnMode::Row_Sequencial)
+		{
+			EnemyTypeIndex = FMath::Clamp(i, 0, EnemyClass.Num() - 1);
+		}
+
+		for (int j = 0; j < Column; j++)
+		{
+			if (EnemySpawnMode == EEnemySpawnMode::Individual_Random)
+			{
+				EnemyTypeIndex = FMath::RandRange(0, EnemyClass.Num() - 1);
+			}
+
+			FVector Center = GetActorLocation();
+			Center += GetActorRightVector() * j * HorizontalStride;
+			Center -= GetActorUpVector() * i * VerticalStride;
+			//DrawDebugBox(GetWorld(), Center, FVector(50.f, 50.f, 50.f), FColor::Blue, true);
+			SpawnAnEnemy(EnemyTypeIndex, Center, GetActorRotation());
+		}
 	}
-
-
-	FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::FireAtPlayer);
-	GetWorldTimerManager().SetTimer(
-		TimerHandle_FireAtPlayer,
-		TimerDelagate,
-		FireRate,
-		true);
-
-	RemainingEnemyCount = Row * Column;
-	CurrentMovementSpeed = MovementSpeed;
-
-	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
-	if (bShouldRegisterToGameState && IsValid(GBS))
-	{
-		GBS->InitEnemiesLeft(RemainingEnemyCount);
-	}
-
 }
 
 void AEnemySpawner::ResetSpawner(int Level)
 {
+	// Enemies shoot faster in each level
+	FireRate *= 0.9;
+	FireRate = FMath::Clamp(FireRate, MaxFireRate, FireRate);
 
 	//update the height and reset the location;
 	MovementDirection = EMovementDirection::Right;
@@ -444,22 +475,7 @@ void AEnemySpawner::ResetSpawner(int Level)
 	}
 
 	// reset box colliders
-	LeftBoxCurrentColumn = 1;
-	RightBoxCurrentColumn = Column;
-
-	FVector StartPoint = -GetActorRightVector() * boxMarginToScreenEnd;
-	FVector EndPoint = GetActorRightVector() * (((Column - 1) * HorizontalStride) + boxMarginToScreenEnd);
-
-	LeftBoxComponent->SetRelativeLocation(StartPoint);
-	RightBoxComponent->SetRelativeLocation(EndPoint);
-
-	LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	RightBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
-	if (LeftBoxCurrentColumn == RightBoxCurrentColumn)
-	{
-		LeftBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
+	InitializeEdgeScreenBoxes();
 
 
 	FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::FireAtPlayer);
@@ -513,6 +529,11 @@ void AEnemySpawner::SetEdgeScreenCollision(bool bEnable)
 void AEnemySpawner::SetEnemiesCanShoot(bool bCanShoot)
 {
 	bEnemiesCanShoot = bCanShoot;
+}
+
+const TArray<TObjectPtr<AEnemyBasePawn>>& AEnemySpawner::GetEnemies()
+{
+	return Enemies;
 }
 
 void AEnemySpawner::UpdateMovementSpeed()

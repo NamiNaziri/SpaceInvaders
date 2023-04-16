@@ -34,7 +34,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Negative Speed uses the speed defined in the projectile component
-	void Launch(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed = -1.f);
+	bool Launch(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed = -1.f);
 
 		TObjectPtr<UObjectPoolComponent> GetPoolComponent();
 

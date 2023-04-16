@@ -11,6 +11,15 @@ class AProjectileBaseActor;
 class AProjectileLauncher;
 class UHealthComponent;
 
+
+/*
+*	Base class for player and enemiy pawn. 
+*	It contains simple mesh with a box collider and health and projectile component.
+*	It also contains a simple rotational animations that can be disabled. 
+*	Now to disable the animations, the sub class should set the bDisableAnimation to true and also should disable the tick funcion in blueprint.
+*	Since animation is the only functionality the uses the tick function, we will disable tick if the bDisableAnimation flag set to false.
+*/
+
 UCLASS()
 class SPACEINVADERS_API ABasePawn : public APawn
 {
@@ -50,6 +59,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Visual|Particle")
 		TObjectPtr<UParticleSystem> ExplosionParticleSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Visual|Animation")
+		bool bDisableAnimation = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Visual|Animation")
 		float TargetAngleDifference = 50.f;

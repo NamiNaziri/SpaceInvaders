@@ -10,9 +10,13 @@ class AEnemySpawner;
 class APlayerBaseController;
 class ACoreHUD;
 class ASpawnLocationActor;
+class AEnemyBasePawn;
 
 UDELEGATE()
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemainingTimeUpdated, float, RemainingTime);
+
+UDELEGATE()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelAdvanced, int, Level);
 
 
 /**
@@ -25,6 +29,7 @@ class SPACEINVADERS_API ACoreGameMode : public AGameModeBase
 	
 public:
 
+	ACoreGameMode();
 
 	virtual void StartPlay() override;
 
@@ -33,9 +38,19 @@ public:
 	UPROPERTY(BlueprintAssignable)
 		FOnRemainingTimeUpdated OnRemainingTimeUpdated;
 
+
+	UPROPERTY(BlueprintAssignable)
+		FOnLevelAdvanced OnLevelAdvanced;
+
 	virtual void PostLogin(APlayerController* NewPlayer);
 
+
+	UFUNCTION(BlueprintCallable)
+		void PlayerDied();
+
+
 protected: 
+
 
 	UPROPERTY()
 		int Level = 1;
@@ -79,6 +94,15 @@ protected:
 		float UFOColisionDisableDelay = 1.f;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|Sound Cue")
+		TObjectPtr<USoundBase> UFOSoundCue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|Sound Cue")
+		TObjectPtr<USoundBase> GameOverSoundCue;
+
+	UPROPERTY()
+		TObjectPtr<UAudioComponent> UFOAudioComponent;
+
 	UPROPERTY()
 		TObjectPtr<ASpawnLocationActor> SpawnLocationActor;
 
@@ -88,8 +112,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|Spawn")
 		TSubclassOf<AEnemySpawner> EnemySpawnerClass;
 
+
 	UPROPERTY()
 		TObjectPtr<AEnemySpawner> UFOSpawner;
+
+	UPROPERTY()
+		TObjectPtr<AEnemyBasePawn> UFOPawn;
 
 	UPROPERTY()
 		float RemainingTime;
@@ -106,6 +134,8 @@ protected:
 		TObjectPtr <ACoreHUD> CoreHUD;
 
 
+
+
 	UFUNCTION()
 		void StartNewLevel();
 
@@ -117,4 +147,8 @@ protected:
 
 	UFUNCTION()
 		void OnUFOCollisionDisable();
+
+	UFUNCTION()
+		void OnUFOPawnDestroyed(AEnemyBasePawn* Enemy);
+
 };

@@ -39,6 +39,11 @@ void ABasePawn::BeginPlay()
 	InitProjectileLauncher();
 	PrevLocation = GetActorLocation();
 	InitMeshYaw = Mesh->GetRelativeRotation().Yaw;
+
+	if (bDisableAnimation)
+	{
+		PrimaryActorTick.bCanEverTick = false;
+	}
 }
 
 // Called every frame

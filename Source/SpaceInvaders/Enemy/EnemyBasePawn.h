@@ -42,8 +42,11 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Points)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Enemy|Points")
 		float PointsPerKill = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Enemy|Sound Cue")
+		TObjectPtr<USoundBase> ExplosionSoundCue;
 
 	UPROPERTY()
 		AController* LastInstigator;
@@ -55,6 +58,10 @@ protected:
 	virtual void TakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
 
 	virtual void HealthBecomeZero(AActor* OwnerActor) override;
+
+
+	UFUNCTION()
+		void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 
 };

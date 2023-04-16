@@ -9,7 +9,7 @@
 
 class UInputMappingContext;
 class UInputAction;
-
+class USoundBase;
 
 /*
 *	TimerBased: The fire rate depends on timer. for example, player can shoot evert X seconds.	
@@ -40,7 +40,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
+
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
@@ -48,40 +48,46 @@ public:
 
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Player|Sound Cue")
+		TObjectPtr<USoundBase> ImpactSoundCue;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Player|Movement")
 		float MovementSpeed = 20.f;
 
-	UPROPERTY(Category = Pawn, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Player|Movement")
 		TObjectPtr<UPawnMovementComponent> MovementComponent;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Input)
-	TObjectPtr<UInputMappingContext> Default_KBM_MappingContext;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Player|Input")
+		TObjectPtr<UInputMappingContext> Default_KBM_MappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Input)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Player|Input")
 		TObjectPtr<UInputAction> MoveInputAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Input)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Player|Input")
 		TObjectPtr<UInputAction> ShootInputAction;
 
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Shooting)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Player|Shooting")
 		TEnumAsByte<EFireRateMode> FireRateMode= EFireRateMode::AvailabilityBased;
 
-	// Rate at which a weapon can fire projectiles. 1 shot per second.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Shooting)
+	/* Rate at which a weapon can fire projectiles. 1 shot per FireRate second. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Player|Shooting")
 		float FireRate = 1.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Player|Sound Cue")
+		TObjectPtr<USoundBase> ShootingSoundCue;
+
+	/* Timer used for handling fire rate and TimerBased EFireRateMode*/
 	FTimerHandle TimerHandle_CanShoot;
 
 	bool bCanShoot = true;
 
-		virtual void TakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
+	virtual void TakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
 
-		virtual void HealthBecomeZero(AActor* OwnerActor) override;
+	virtual void HealthBecomeZero(AActor* OwnerActor) override;
 
 	UFUNCTION()
 		void Move(const FInputActionInstance& Instance);

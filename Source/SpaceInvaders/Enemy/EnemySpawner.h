@@ -25,19 +25,28 @@ enum EEnemyMovementMode
 	Freezed UMETA(DisplayName = "Freeze")
 };
 
+UENUM(BlueprintType)
+enum EEnemySpawnMode
+{
+	Row_Random UMETA(DisplayName = "Row_Random"), // Chooses a class for each row randomly. (If you want the randomness be unform, you should only have a single item for each class in EnemyClass array. by having several item it's give that class more chance to be chosen)
+	Individual_Random UMETA(DisplayName = "Individual_Random"), // Chooses a class for each place randomly. 
+	Row_Sequencial UMETA(DisplayName = "Row_Sequencial"), // for row = i it chooses the EnemyClass[i]. So for spawner with 5 row, you should add 5 item to EnemyClass array.
+};
+
+/*
+*	The class is responsible for spawning enemies in a grid. 
+*	The actor's location is the location of the top left corner of this grid.	
+*/
 
 UCLASS()
 class SPACEINVADERS_API AEnemySpawner : public AActor
 {
 	GENERATED_BODY()
 
-		// the spawner is located on the top left of the enemies.
-
-
 public:	
 	// Sets default values for this actor's properties
 	AEnemySpawner();
-	~AEnemySpawner();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -46,15 +55,20 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	/* This can be used to create the enemies in editor but currently it is disabled*/
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	/* Resets the spawner to it's original state and does the necessary adjustment for new level.*/
 	void ResetSpawner(int Level);
 
+	/* Pauses all the timers. Used when advancing levels.*/
 	void PauseAllTimers();
 
 	void SetEdgeScreenCollision(bool bEnable);
 
 	void SetEnemiesCanShoot(bool bCanShoot);
+
+	const TArray<TObjectPtr<AEnemyBasePawn>>& GetEnemies();
 
 protected:
 
@@ -73,13 +87,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
 		float boxMarginToScreenEnd = 1.f;
 
+	/* 
+	*	Should this spawner register itself with the game state in order to affect level advancement or not. 
+	*	 e.g. the ufo sets this to false since destroying it doesn't affect the level advancement.
+	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
 		bool bShouldRegisterToGameState = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
+		TEnumAsByte<EEnemySpawnMode> EnemySpawnMode = EEnemySpawnMode::Row_Random;
 
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Enemy")
-		TArray<TSubclassOf<AEnemyBasePawn>> EnemyType;
+		TArray<TSubclassOf<AEnemyBasePawn>> EnemyClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Enemy")
 		TArray<TObjectPtr<AEnemyBasePawn>> Enemies;
@@ -87,8 +108,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Enemy")
 		bool bEnemiesCanShoot = true;
 
-	// Row and Column of active an available shooters. 
-	// <Key=Column, Value=Row>
+	/* 
+	*	Row and Column of active an available shooters.
+	*	<Key=Column, Value=Row> 
+	*/
 	TMap<int32, int32> ActiveShooters;
 	
 	TArray<int32> DestroyedEnemiesPerColumn;
@@ -140,9 +163,12 @@ protected:
 		int32 CurrentHeightLevel = 0;
 
 	
-	// Rate at which a weapon can fire projectiles. 1 shot per second.
+	// Rate at which a weapon can fire projectiles. 1 shot per every FireRate second.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Spawner|Enemy")
 		float FireRate = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Spawner|Enemy")
+		float MaxFireRate = 0.5f;
 
 	FTimerHandle TimerHandle_FireAtPlayer;
 
@@ -207,6 +233,11 @@ protected:
 	UFUNCTION()
 		void InitializeSpawner();
 
+	UFUNCTION()
+		void InitializeEdgeScreenBoxes();
+
+	UFUNCTION()
+		void SpawnAllEnemies();
 
 
 	TObjectPtr<AEnemyBasePawn> GetEnemy(int r, int c);

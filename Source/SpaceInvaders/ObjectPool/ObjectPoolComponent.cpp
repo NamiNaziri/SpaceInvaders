@@ -40,6 +40,7 @@ TObjectPtr<AActor> UObjectPoolComponent::GetNewObjectInstance()
 		{
 			bIsUsed = true;
 
+			Object->SetActorTickEnabled(true);
 			Object->SetActorHiddenInGame(false);
 			Object->SetActorEnableCollision(true);
 
@@ -50,10 +51,11 @@ TObjectPtr<AActor> UObjectPoolComponent::GetNewObjectInstance()
 	if (bShouldCreateNew)
 	{
 		// if not found, create a newObj
-		UE_LOG(LogTemp, Warning, TEXT("Object pool had shortage. A new object created."))
-			TObjectPtr<AActor> newObj = SpawnSingleObject();
+		UE_LOG(LogTemp, Warning, TEXT("Object pool had shortage. A new object created."));
+		TObjectPtr<AActor> newObj = SpawnSingleObject();
 		PooledObjects[newObj] = true;
 
+		newObj->SetActorTickEnabled(true);
 		newObj->SetActorHiddenInGame(false);
 		newObj->SetActorEnableCollision(true);
 		return newObj;
@@ -69,10 +71,12 @@ TObjectPtr<AActor> UObjectPoolComponent::GetNewObjectInstance()
 
 void UObjectPoolComponent::ReleaseObjectInstanceToPool(AActor* ObjectInstance)
 {
-	UE_LOG(LogTemp,Warning,TEXT("ReleaseObjectInstanceToPool"))
+	UE_LOG(LogTemp, Warning, TEXT("ReleaseObjectInstanceToPool"));
+	ObjectInstance->SetActorTickEnabled(false); 
 	ObjectInstance->SetActorHiddenInGame(true);
 	ObjectInstance->SetActorEnableCollision(false);
-	ObjectInstance->SetActorLocation(FVector(0.f, -1000.f, 0.f));
+	
+	ObjectInstance->SetActorLocation(FVector(-10000.f, -10000.f, +4000.f));
 	PooledObjects[ObjectInstance] = false;
 
 }
@@ -99,8 +103,10 @@ TObjectPtr<AActor> UObjectPoolComponent::SpawnSingleObject()
 		SpawnParams.Instigator = Cast<APawn>(GetOwner());
 
 		// Spawn the actor
-		AActor* SpawnedObject = GetWorld()->SpawnActor<AActor>(ClassToSpawn, FVector(0.f, -1000.f, 0.f), FRotator(0.f), SpawnParams);
+		AActor* SpawnedObject = GetWorld()->SpawnActor<AActor>(ClassToSpawn, FVector(0.f, -100000.f, 0.f), FRotator(0.f), SpawnParams);
 
+
+		SpawnedObject->SetActorTickEnabled(false);
 		SpawnedObject->SetActorHiddenInGame(true);
 		SpawnedObject->SetActorEnableCollision(false);
 		//SpawnedObject->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);

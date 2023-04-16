@@ -12,7 +12,7 @@ EGameProgressionState ACoreGameState::GetCurrentState()
 void ACoreGameState::EnemyDestroyed()
 {
     this->EnemiesLeft -= 1;
-
+    UE_LOG(LogTemp, Warning, TEXT("Left Enemies: %d"), EnemiesLeft);
     if (EnemiesLeft == 0)
     {
         AdvanceLevel();
