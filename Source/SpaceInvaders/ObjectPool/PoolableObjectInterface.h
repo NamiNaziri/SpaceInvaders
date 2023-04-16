@@ -23,7 +23,7 @@ class SPACEINVADERS_API IPoolableObjectInterface
 {
 	GENERATED_BODY()
 
-	//reference: https://forums.unrealengine.com/t/c-get-delegates-in-interface/438051/5
+	//reference of how to return delegates in an interface: https://forums.unrealengine.com/t/c-get-delegates-in-interface/438051/5
 
 public:
 	/*

@@ -70,6 +70,7 @@ void AEnemySpawner::RightBoxOnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 	{
 		return;
 	}
+
 	CurrentHeightLevel++;
 	SetMovementDirection(EMovementDirection::Down);
 	Direction *= -1;
@@ -81,9 +82,8 @@ void AEnemySpawner::LeftBoxOnOverlapBegin(UPrimitiveComponent* OverlappedCompone
 	{
 		return;
 	}
+
 	CurrentHeightLevel++;
-
-
 	SetMovementDirection(EMovementDirection::Down);
 	Direction *= -1;
 }
@@ -96,13 +96,11 @@ void AEnemySpawner::Move(float DeltaTime)
 		return;
 	}
 
-
 	FVector CurrentLocation = GetActorLocation();
 
 	switch (MovementDirection)
 	{
 		case EMovementDirection::Right:
-			
 			SetActorLocation(CurrentLocation + GetActorRightVector() * CurrentMovementSpeed * DeltaTime);
 			break;
 
@@ -152,8 +150,8 @@ void AEnemySpawner::SpawnAnEnemy(int EnemyTypeIndex, FVector SpawnLocation, FRot
 			AEnemyBasePawn* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBasePawn>(EnemyClass[EnemyTypeIndex], SpawnLocation, SpawnRotation, SpawnParams);
 			if (SpawnedEnemy)
 			{
-
 				Enemies.Push(SpawnedEnemy);
+				SpawnedEnemy->OnEnemyDestroyed.AddDynamic(this, &AEnemySpawner::OnEnemyDestroyed);
 				SpawnedEnemy->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 			}
 			else
@@ -163,15 +161,14 @@ void AEnemySpawner::SpawnAnEnemy(int EnemyTypeIndex, FVector SpawnLocation, FRot
 		}
 
 	}
-	
 }
 
 void AEnemySpawner::DestroyAllEnemies()
 {
-	for (auto enemy : Enemies)
+	for (auto Enemy : Enemies)
 	{
-		if(enemy)
-			enemy->Destroy();
+		if(Enemy)
+			Enemy->Destroy();
 	}
 	Enemies.Empty();
 }
@@ -190,7 +187,6 @@ void AEnemySpawner::DelayMovmenet()
 
 void AEnemySpawner::ResetMovement()
 {
-	
 	SetMovementMode(EEnemyMovementMode::Normal);
 	GetWorldTimerManager().ClearTimer(TimerHandle_ResetMovement);
 }
@@ -217,12 +213,13 @@ void AEnemySpawner::UpdateEdgeScreenBoxes(int EnemyIndex)
 
 	DestroyedEnemiesPerColumn[EnemyColumn - 1]++;
 
-	if (DestroyedEnemiesPerColumn[EnemyColumn - 1] == Row)
+	if (DestroyedEnemiesPerColumn[EnemyColumn - 1] == Row) // Check if all enemies of this column are destroyed.
 	{
-		if (LeftBoxCurrentColumn == EnemyColumn)
+		if (LeftBoxCurrentColumn == EnemyColumn) // Check if this is the column that left edge screen box located.
 		{
-			LeftBoxCurrentColumn++;
-			for (int i = EnemyColumn + 1; i <= Column; i++)
+			LeftBoxCurrentColumn++; // Move the box forward
+
+			for (int i = EnemyColumn + 1; i <= Column; i++) // Move more if other columns also have lost their enemies.
 			{
 				if (DestroyedEnemiesPerColumn[i - 1] == Row)
 				{
@@ -234,7 +231,6 @@ void AEnemySpawner::UpdateEdgeScreenBoxes(int EnemyIndex)
 				}
 			}
 		}
-
 
 		if (RightBoxCurrentColumn == EnemyColumn)
 		{
@@ -260,7 +256,6 @@ void AEnemySpawner::UpdateEdgeScreenBoxes(int EnemyIndex)
 
 	FVector LeftBoxNewPos = GetActorRightVector() * (((LeftBoxCurrentColumn - 1) * HorizontalStride) - boxMarginToScreenEnd);
 	FVector RightBoxNewPos = GetActorRightVector() * (((RightBoxCurrentColumn - 1) * HorizontalStride) - boxMarginToScreenEnd);
-
 
 	LeftBoxComponent->SetRelativeLocation(LeftBoxNewPos);
 	RightBoxComponent->SetRelativeLocation(RightBoxNewPos);
@@ -302,7 +297,6 @@ void AEnemySpawner::FireAtPlayer()
 		return;
 	}
 
-	//TODO change the timer!?
 	TArray<int32> KeyArray;
 	ActiveShooters.GenerateKeyArray(KeyArray);
 	if (ActiveShooters.Num() > 0)
@@ -322,15 +316,13 @@ void AEnemySpawner::FireAtPlayer()
 		}
 
 	}
-
-
 }
 
 void AEnemySpawner::InitializeSpawner()
 {
 	MovementDirection = EMovementDirection::Right;
 	Direction = 1.f;
-	SetActorLocation(GetActorLocation() - GetActorUpVector() * CurrentHeightLevel * VerticalMovementStride);
+	SetActorLocation(GetActorLocation() - (GetActorUpVector() * CurrentHeightLevel * VerticalMovementStride));
 
 	/*
 	*	Spawner starts at freeze state. by calling the Delay movement it would wait for DelayDuration and the changes the 
@@ -352,16 +344,10 @@ void AEnemySpawner::InitializeSpawner()
 	}
 
 	/* Adjust edge screen collision boxes */
-
 	InitializeEdgeScreenBoxes();
 
 	/* Spawn Enemies*/
 	SpawnAllEnemies();
-
-	for (auto& Enemy : Enemies)
-	{
-		Enemy->OnEnemyDestroyed.AddDynamic(this, &AEnemySpawner::OnEnemyDestroyed);
-	}
 
 	/* Set timer for fire rate*/
 	FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::FireAtPlayer);
@@ -410,7 +396,7 @@ void AEnemySpawner::SpawnAllEnemies()
 	FVector StartPoint = -GetActorRightVector() * boxMarginToScreenEnd;
 	FVector EndPoint = GetActorRightVector() * (((Column - 1) * HorizontalStride) + boxMarginToScreenEnd);
 
-	FlushPersistentDebugLines(GetWorld());
+	//FlushPersistentDebugLines(GetWorld());
 
 	//DrawDebugSphere(GetWorld(), GetActorLocation(), 10.f, 12, FColor::Red, true);
 
@@ -449,7 +435,7 @@ void AEnemySpawner::ResetSpawner(int Level)
 {
 	// Enemies shoot faster in each level
 	FireRate *= 0.9;
-	FireRate = FMath::Clamp(FireRate, MaxFireRate, FireRate);
+	FireRate = FMath::Max(FireRate, MaxFireRate);
 
 	//update the height and reset the location;
 	MovementDirection = EMovementDirection::Right;

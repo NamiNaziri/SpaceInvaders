@@ -55,10 +55,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	/* This can be used to create the enemies in editor but currently it is disabled*/
+	/* This can be used to create the enemies in editor mode, but currently it is disabled*/
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	/* Resets the spawner to it's original state and does the necessary adjustment for new level.*/
+	/* Resets the spawner to it's original state and does the necessary adjustment for new level. I am not using built-in reset function on purpose.*/
 	void ResetSpawner(int Level);
 
 	/* Pauses all the timers. Used when advancing levels.*/
@@ -88,15 +88,14 @@ protected:
 		float boxMarginToScreenEnd = 1.f;
 
 	/* 
-	*	Should this spawner register itself with the game state in order to affect level advancement or not. 
-	*	 e.g. the ufo sets this to false since destroying it doesn't affect the level advancement.
+	*	Should this spawner register itself to the game state in order to affect level advancement or not. 
+	*	 e.g. The UFO sets this to false since destroying it doesn't affect the level advancement.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
 		bool bShouldRegisterToGameState = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Structure")
 		TEnumAsByte<EEnemySpawnMode> EnemySpawnMode = EEnemySpawnMode::Row_Random;
-
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Enemy")
@@ -114,6 +113,7 @@ protected:
 	*/
 	TMap<int32, int32> ActiveShooters;
 	
+	/* Number of enemies destroyed per column. Used for when we want to update the edge screen colliders. */
 	TArray<int32> DestroyedEnemiesPerColumn;
 
 	int32 LeftBoxCurrentColumn;
@@ -121,37 +121,30 @@ protected:
 
 	int RemainingEnemyCount;
 
-	/*Base movement speed */
+	/* Base movement speed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float MovementSpeed = 400.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
-	/*Current Movement Speed*/
+	/* Current Movement Speed */
 	float CurrentMovementSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float MaxMovementSpeed = 1000.f;
 	/*
 	* This curve needs to be normalized between zero and one, as it will determine how the speed increases when an enemy is destroyed.
-	* If the curve does not exist, a linear rate will be applied instead.
+	* If the curve does not exist, a linear rate will be used instead.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		UCurveFloat* SpeedChangeRateCurve;
 
-	// wait after every DelayInterval(seconds)
+	/* Wait (stop) after every DelayInterval(seconds) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float DelayInterval = 1.f;
 
-
-
-	// after the delay interval is reached, wait for DelayDuration(seconds)
+	/* After the delay interval is reached, wait for DelayDuration(seconds) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float DelayDuration = 1.f;
-
-
-	FTimerHandle TimerHandle_DelayMovement;
-
-	FTimerHandle TimerHandle_ResetMovement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Spawner|Movement")
 		float VerticalMovementStride = 5;
@@ -170,6 +163,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Spawner|Enemy")
 		float MaxFireRate = 0.5f;
 
+	FTimerHandle TimerHandle_DelayMovement;
+
+	FTimerHandle TimerHandle_ResetMovement;
+
 	FTimerHandle TimerHandle_FireAtPlayer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -178,21 +175,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBoxComponent> RightBoxComponent;
 
+	/* Current Direction of the movement (we need it when we want to know what direction we should move next.)*/
 	float Direction = 1.f;
 
 	TEnumAsByte<EMovementDirection> MovementDirection = EMovementDirection::Right;
 
 	TEnumAsByte<EEnemyMovementMode> MovementMode = EEnemyMovementMode::Freezed;
 
-
-
-
 	UFUNCTION(BlueprintCallable)
 		void SetMovementDirection(TEnumAsByte<EMovementDirection> NewMovementMode);
 
 	UFUNCTION(BlueprintCallable)
 		void SetMovementMode(TEnumAsByte < EEnemyMovementMode> NewMovementMode);
-
 
 	UFUNCTION()
 		void RightBoxOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -201,16 +195,16 @@ protected:
 		void LeftBoxOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void Move(float DeltaTime);
+		void Move(float DeltaTime);
 	
 	UFUNCTION()
-	void SpawnAnEnemy(int EnemyTypeIndex, FVector SpawnLocation, FRotator SpawnRotation);
+		void SpawnAnEnemy(int EnemyTypeIndex, FVector SpawnLocation, FRotator SpawnRotation);
 
 	UFUNCTION()
-	void DestroyAllEnemies();
+		void DestroyAllEnemies();
 
 	UFUNCTION()
-	void DelayMovmenet();
+		void DelayMovmenet();
 
 	UFUNCTION()
 		void ResetMovement();
@@ -238,7 +232,6 @@ protected:
 
 	UFUNCTION()
 		void SpawnAllEnemies();
-
 
 	TObjectPtr<AEnemyBasePawn> GetEnemy(int r, int c);
 };

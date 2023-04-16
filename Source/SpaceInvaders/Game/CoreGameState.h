@@ -27,9 +27,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AdvanceLevel();
 
-
 protected:
-
 
 	UPROPERTY()
 		int RemainingEnemies = 0;

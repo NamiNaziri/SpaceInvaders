@@ -11,12 +11,10 @@ void UCoreGameInstance::Init()
 {
 	Super::Init();
 	InitSaveFile();
-
 }
 
 void UCoreGameInstance::InitSaveFile()
 {
-
 	/* Try to load save data or create one if it doesn't exist. */
 	bool bSaveGameExist = UGameplayStatics::DoesSaveGameExist(SaveSlotName, 0);
 
@@ -61,7 +59,6 @@ void UCoreGameInstance::AddToLeaderboard(FString PlayerName, float Score)
 
 const TArray<FLeaderboardInfo>& UCoreGameInstance::GetLeaderboard()
 {
-
 	return Leaderboard;
 }
 
@@ -73,10 +70,10 @@ void UCoreGameInstance::OnLoadGameFromSlotFinished(const FString& SlotName, cons
 		if (CoreSaveGame)
 		{
 			CoreSaveGame->LoadLeaderboard(this->Leaderboard);
+
 			Leaderboard.Sort([](const FLeaderboardInfo& Info1, const FLeaderboardInfo& Info2) {
 				return  Info1.Score > Info2.Score;
 				});
-
 		}
 	}
 	else

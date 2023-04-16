@@ -6,7 +6,6 @@ ASpawnLocationActor::ASpawnLocationActor()
 {
  	// We don't need tick
 	PrimaryActorTick.bCanEverTick = false;
-
 }
 
 // Called when the game starts or when spawned

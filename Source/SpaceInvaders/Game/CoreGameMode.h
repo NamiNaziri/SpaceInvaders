@@ -86,6 +86,10 @@ protected:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Level|UFO")
 		float UFOLifeSpanRandomDeviation = 0.f;
 
+	/* 
+	*	The UFO is usually spawnned outside of the edge screen. 
+	*	In order to moves inside the screen, we first disable it's edge screen collision boxes and after UFOColisionDisableDelay seconds we turn them back on, so it could collide again.
+	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|UFO")
 		float UFOColisionDisableDelay = 1.f;
 
@@ -115,12 +119,9 @@ protected:
 
 	UPROPERTY()
 		TObjectPtr<AEnemyBasePawn> UFOPawn;
-
 	
 	UPROPERTY()
 		float RemainingTime;
-
-	
 
 	UPROPERTY()
 		TObjectPtr<AEnemySpawner> EnemySpawner;
@@ -129,7 +130,7 @@ protected:
 		TObjectPtr<APlayerBaseController> PlayerController;
 
 	UPROPERTY()
-		TObjectPtr <ACoreHUD> CoreHUD;
+		TObjectPtr<ACoreHUD> CoreHUD;
 
 	UFUNCTION()
 		void StartNewLevel();

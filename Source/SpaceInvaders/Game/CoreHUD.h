@@ -15,10 +15,6 @@ UCLASS()
 class SPACEINVADERS_API ACoreHUD : public AHUD
 {
 	GENERATED_BODY()
-	//ACoreHUD();
-	//virtual void DrawHUD() override;
-
-
 
 public:
 
@@ -51,8 +47,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void ClearLeaderboardEntryModel();
-
-
 
 protected:
 

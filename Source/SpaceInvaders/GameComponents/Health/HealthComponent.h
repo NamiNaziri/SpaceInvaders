@@ -12,7 +12,7 @@ UDELEGATE()
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthBecomeZero, AActor*, OwnerActor);
 
 /*
-*	Simple health component that can manage health of different actors.	
+*	Basic health component that can manage health of different actors.	
 */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEINVADERS_API UHealthComponent : public UActorComponent

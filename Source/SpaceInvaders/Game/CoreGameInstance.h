@@ -47,23 +47,21 @@ public:
 	void InitSaveFile();
 
 	UFUNCTION(BlueprintCallable)
-	void AddToLeaderboard(FString PlayerName, float Score);
+		void AddToLeaderboard(FString PlayerName, float Score);
 
 	UFUNCTION(BlueprintCallable)
-	const TArray<FLeaderboardInfo>& GetLeaderboard();
-
-
+		const TArray<FLeaderboardInfo>& GetLeaderboard();
 
 protected:
 
 	UPROPERTY()
-	TArray<FLeaderboardInfo> Leaderboard;
+		TArray<FLeaderboardInfo> Leaderboard;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), category = "Save")
 		FString SaveSlotName = "GameSlot0";
 
 	UPROPERTY()
-	TObjectPtr<UCoreSaveGame> CoreSaveGame;
+		TObjectPtr<UCoreSaveGame> CoreSaveGame;
 
 
 	void OnLoadGameFromSlotFinished(const FString& SlotName, const int32 UserIndex, USaveGame* SaveGame);

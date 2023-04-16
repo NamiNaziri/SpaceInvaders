@@ -21,9 +21,7 @@ void ACoreGameState::InitRemainingEnemiesCount(float MaxEnemies)
 
 void ACoreGameState::AdvanceLevel()
 {
-
     UE_LOG(LogTemp, Warning, TEXT("Level Advanced"));
     ACoreGameMode* GameMode = Cast<ACoreGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
     GameMode->AdvanceLevel();
-
 }

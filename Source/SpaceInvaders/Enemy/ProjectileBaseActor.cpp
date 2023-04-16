@@ -26,7 +26,6 @@ AProjectileBaseActor::AProjectileBaseActor()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(RootComponent);
 
-
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->UpdatedComponent = BoxComponent;
 }
@@ -35,14 +34,12 @@ AProjectileBaseActor::AProjectileBaseActor()
 void AProjectileBaseActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void AProjectileBaseActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 FOnPoolableObjectReleaseDelegate& AProjectileBaseActor::GetPoolableObjectReleaseDelegate()
@@ -62,7 +59,7 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleSystem, GetActorTransform());
 	}
 
-	ADestructibleActor* DestructibleActor = Cast<ADestructibleActor >(OtherActor);
+	const ADestructibleActor* DestructibleActor = Cast<ADestructibleActor >(OtherActor);
 	if (DestructibleActor && MasterFieldClass)
 	{
 		FActorSpawnParameters SpawnParams;
@@ -74,13 +71,10 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 	}
 
 
-	/*
-	* Before resetting the enemies that depend on the TakeDamage function, the projectile should be released in order to disable the collision..
-	* The problem with collision happens when resetting enemies.
-	* If the projectile still has collision, it can collide and kill an enemy while we are resetting the last enemy.
-	* also it should be after the particle and destroctible stuff since we need the current location of the projectile. (atleast for the emitter)
+	/* 
+	*	Release the projectile to the pool so its collision gets disable.
+	*	This should happen before applying damage and after displaying vfx and any thing that needs the current location of the projectile.	
 	*/
-
 	PoolableObjectReleaseDelegate.Broadcast(this);
 
 	// apply point damage
@@ -94,14 +88,9 @@ void AProjectileBaseActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 			EventInstigator = OwnerPawn->GetController();
 		}
 	}
-	
 
 	FPointDamageEvent PDE;
 	PDE.HitInfo = SweepResult;
 	OtherActor->TakeDamage(Damage, PDE, EventInstigator, this);
-	//TODO perfrom emitter and stuff
-
-
-
 }
 

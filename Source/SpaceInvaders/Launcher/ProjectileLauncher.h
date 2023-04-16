@@ -32,8 +32,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/*
-	*	Gets a single projectile from the pool and launches toward the give direction
-	*	Negative Speed uses the speed defined in the projectile component
+	*	Gets a single projectile from the pool and launches toward the give direction.
+	*	Negative Speed uses the speed defined in the projectile component.
 	*/
 	bool Launch(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed = -1.f);
 

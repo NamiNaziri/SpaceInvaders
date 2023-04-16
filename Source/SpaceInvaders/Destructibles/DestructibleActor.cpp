@@ -13,8 +13,6 @@
 // Sets default values
 ADestructibleActor::ADestructibleActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-
 
 	// The boxcomponent size should only be adjusted using box extent variable
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Scene Component"));
@@ -35,8 +33,6 @@ ADestructibleActor::ADestructibleActor()
 	HealthComponent->OnHealthBecomeZero.AddDynamic(this, &ADestructibleActor::HealthBecomeZero);
 
 	this->OnTakePointDamage.AddDynamic(this, &ADestructibleActor::TakePointDamage);
-
-
 }
 
 
@@ -48,11 +44,10 @@ void ADestructibleActor::BeginPlay()
 	// How this works?
 
 	// The Actor destroys when it's health reaches zero.
-	// Since the anchor is set to the middle of the boxcomponent( or the object it self) we should 
-	// move the box by the amounth so it would reach middle of the object when the health becomes zero (or close to zero with some error)
+	// Since the anchor is set to the middle of the boxcomponent( or the object itself) we should 
+	// move the box so it would reach middle of the object when the health reaches zero (or close to zero with some error)
 
 	float BoxHalfHeight = BoxComponent->GetUnscaledBoxExtent().Z / 2.f;
-	//float AnchorLocation = AnchorField->GetActorLocation().Z;
 
 	BoxAdjustmentOffset = BoxHalfHeight / HealthComponent->GetMaxHealth();
 
@@ -78,7 +73,7 @@ void ADestructibleActor::OnConstruction(const FTransform& Transform)
 
 float ADestructibleActor::GetRemainingHealth()
 {
-	return HealthComponent->GetMaxHealth()- HealthComponent->GetCurrentHealth();
+	return HealthComponent->GetMaxHealth() - HealthComponent->GetCurrentHealth();
 }
 
 void ADestructibleActor::TakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser)
@@ -89,25 +84,26 @@ void ADestructibleActor::TakePointDamage(AActor* DamagedActor, float Damage, ACo
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DestructionParticleSystem, HitLocation,GetActorRotation());
 	}
 
+	if (DebrisFallingSoundCue)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), DebrisFallingSoundCue);
+	}
+
 	FVector NewBoxExtent = BoxComponent->GetUnscaledBoxExtent();
 	NewBoxExtent.Z -= BoxAdjustmentOffset;
 	BoxComponent->SetBoxExtent(NewBoxExtent);
 
 	// 1 means it is been shot from bottom of the object
-	float DamageDirection = HitLocation.Z < GetActorLocation().Z ? 1.f : -1.f;
-	BoxComponent->AddRelativeLocation(DamageDirection * GetActorUpVector() * (BoxAdjustmentOffset));
-
-
+	float ImpactDirection = HitLocation.Z < GetActorLocation().Z ? 1.f : -1.f;
+	BoxComponent->AddRelativeLocation(ImpactDirection * GetActorUpVector() * (BoxAdjustmentOffset));
 
 	HealthComponent->DecreaseHealth(Damage);
 
-	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), HealthComponent->GetCurrentHealth());
-	//BoxComponent
+	UE_LOG(LogTemp, Warning, TEXT("DestructibleActor Health: %f"), HealthComponent->GetCurrentHealth());
 }
 
 void ADestructibleActor::HealthBecomeZero(AActor* OwnerActor)
 {
-
 	GeometryCollection->RemoveAllAnchors();
 
 	if (SelfDestructionDamageClass)
@@ -122,6 +118,7 @@ void ADestructibleActor::HealthBecomeZero(AActor* OwnerActor)
 
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	/* Destroy the object after 4 seconds. 4 seconds is used to be sure that the object is out of the screen.*/
 	SetLifeSpan(4.f);
 }
 

@@ -13,13 +13,11 @@
 
 ACoreGameMode::ACoreGameMode()
 {
-	//AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio component"));
 }
 
 void ACoreGameMode::StartPlay()
 {
 	Super::StartPlay();
-
 
 	SpawnLocationActor = Cast<ASpawnLocationActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnLocationActor::StaticClass()));
 
@@ -32,7 +30,6 @@ void ACoreGameMode::StartPlay()
 	{
 		const float Interval = FMath::FRandRange(FMath::Max(0.0f, UFOSpawnInterval - UFOSpawnRandomDeviation), (UFOSpawnInterval + UFOSpawnRandomDeviation));
 		GetWorldTimerManager().SetTimer(TimerHandle_SpawnUFO, this, &ACoreGameMode::SpawnUFO, Interval,false);
-		
 	}
 
 	if (EnemySpawnerClass )
@@ -41,7 +38,6 @@ void ACoreGameMode::StartPlay()
 		ActorSpawnParameters.Owner = this;
 
 		EnemySpawner = GetWorld()->SpawnActor<AEnemySpawner>(EnemySpawnerClass, ActorSpawnParameters);
-		//EnemySpawner->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 		if (SpawnLocationActor)
 		{
 			EnemySpawner->SetActorLocation(SpawnLocationActor->EnemySpawnerLocation);
@@ -51,15 +47,12 @@ void ACoreGameMode::StartPlay()
 
 void ACoreGameMode::AdvanceLevel()
 {
-	this->Level++;
-	
-	
 	if (EnemySpawner)
 	{
 		EnemySpawner->PauseAllTimers();
 	}
 
-	// set timer to tick every second.
+	// Init timer to tick every second.
 	RemainingTime = NewLevelCountdown;
 	GetWorldTimerManager().SetTimer(TimerHandle_StartNewLevel, this, &ACoreGameMode::StartNewLevel, 1.f, true);
 }
@@ -69,6 +62,8 @@ void ACoreGameMode::StartNewLevel()
 	RemainingTime--;
 	if (RemainingTime == 0)
 	{
+		this->Level++;
+
 		GetWorldTimerManager().ClearTimer(TimerHandle_StartNewLevel);
 		OnLevelAdvanced.Broadcast(Level);
 		
@@ -87,16 +82,17 @@ void ACoreGameMode::SpawnUFO()
 {
 	if (UFOSpawnerClass)
 	{
-
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.Owner = this;
 
 		UFOSpawner = GetWorld()->SpawnActor<AEnemySpawner>(UFOSpawnerClass, ActorSpawnParameters);
 		UFOSpawner->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+
 		if (SpawnLocationActor)
 		{
 			UFOSpawner->SetActorLocation(SpawnLocationActor->UFOSpawnerLocation);
 		}
+
 		UFOSpawner->SetEdgeScreenCollision(false);
 		UFOSpawner->SetEnemiesCanShoot(false);
 
@@ -116,7 +112,6 @@ void ACoreGameMode::SpawnUFO()
 		}
 		
 		UFOAudioComponent = UGameplayStatics::SpawnSound2D(GetWorld(), UFOSoundCue);
-		// todo set other spawner related stuff;
 	}
 }
 

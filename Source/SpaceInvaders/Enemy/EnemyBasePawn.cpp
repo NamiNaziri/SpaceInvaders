@@ -22,8 +22,6 @@ AEnemyBasePawn::AEnemyBasePawn()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Scene Component"));
 	Super::BoxComponent->SetupAttachment(RootComponent);
 
-
-
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemyBasePawn::OnBoxBeginOverlap);
 }
 
@@ -101,7 +99,6 @@ void AEnemyBasePawn::HealthBecomeZero(AActor* OwnerActor)
 
 void AEnemyBasePawn::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
 	if (OtherActor == this || OtherActor == GetOwner())
 	{
 		return;

@@ -34,7 +34,7 @@ public:
 	TObjectPtr<AActor> GetNewObjectInstance();
 
 	UFUNCTION()
-	void ReleaseObjectInstanceToPool(AActor* ObjectInstance);
+		void ReleaseObjectInstanceToPool(AActor* ObjectInstance);
 
 	UFUNCTION()
 		void SetShouldCreateNew(bool ShouldCreateNew);
