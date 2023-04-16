@@ -8,7 +8,7 @@
 #include "../ObjectPool/ObjectPoolComponent.h"
 #include "../Enemy/ProjectileBaseActor.h"
 // Sets default values
-AProjectileLauncher::AProjectileLauncher()
+AProjectileLauncher::AProjectileLauncher(const FObjectInitializer& ObjectInitializer)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;

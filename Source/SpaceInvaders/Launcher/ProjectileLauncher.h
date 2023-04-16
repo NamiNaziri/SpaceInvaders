@@ -22,7 +22,7 @@ class SPACEINVADERS_API AProjectileLauncher : public AActor
 	
 public:	
 	// Sets default values for this actor's properties
-	AProjectileLauncher();
+	AProjectileLauncher(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts or when spawned

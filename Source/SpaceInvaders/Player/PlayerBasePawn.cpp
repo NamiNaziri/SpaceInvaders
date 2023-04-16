@@ -18,6 +18,7 @@
 #include "../ObjectPool/ObjectPoolComponent.h"
 #include "../GameComponents/Health/HealthComponent.h"
 #include "PlayerBaseController.h"
+#include "SpaceInvaders/Launcher/PlayerProjectileLauncher.h"
 
 // Sets default values
 APlayerBasePawn::APlayerBasePawn()
@@ -27,7 +28,6 @@ APlayerBasePawn::APlayerBasePawn()
 	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>(TEXT("Pawn Movement"));
 	MovementComponent->UpdatedComponent = BoxComponent;
 
-	bCanShoot = true;
 
 
 }
@@ -116,51 +116,25 @@ void APlayerBasePawn::Move(const FInputActionInstance& Instance)
 
 void APlayerBasePawn::Shoot(const FInputActionInstance& Instance)
 {
-	if (FireRateMode == EFireRateMode::TimerBased && bCanShoot)
+	FVector ProjectileLocation = GetActorLocation() + GetActorUpVector() * BoxComponent->GetScaledBoxExtent().Z;
+	if (PlayerProjectileLauncher)
 	{
-		bCanShoot = false;
-		if (!ProjectileLauncher)
-			return;
-
-		FVector ProjectileLocation = GetActorLocation() + GetActorUpVector() * BoxComponent->GetScaledBoxExtent().Z;
-		ProjectileLauncher->Launch(ProjectileLocation, GetActorRotation(), GetActorUpVector(), -1.f);
-
-		FTimerDelegate TimerDelagate = FTimerDelegate::CreateUObject(this, &APlayerBasePawn::CanShoot);
-		GetWorldTimerManager().SetTimer(
-			TimerHandle_CanShoot,
-			TimerDelagate,
-			FireRate,
-			false);
+		PlayerProjectileLauncher->Shoot(ProjectileLocation, GetActorRotation(), GetActorUpVector(), -1.f);
 	}
-	else if (FireRateMode == EFireRateMode::AvailabilityBased)
-	{
-		if (!ProjectileLauncher)
-			return;
-
-		FVector ProjectileLocation = GetActorLocation() + GetActorUpVector() * BoxComponent->GetScaledBoxExtent().Z;
-		bool bSuccess = ProjectileLauncher->Launch(ProjectileLocation, GetActorRotation(), GetActorUpVector(), -1.f);
-		if (bSuccess)
-		{
-			UGameplayStatics::PlaySound2D(GetWorld(), ShootingSoundCue);
-		}
-	}
-	
 }
 
-void APlayerBasePawn::CanShoot()
-{
-	bCanShoot = true;
-	GetWorldTimerManager().ClearTimer(TimerHandle_CanShoot);
-}
 
 void APlayerBasePawn::InitProjectileLauncher()
 {
 	Super::InitProjectileLauncher();
 
-	/* When using a projectile-based firing rate, the object pool should not create new objects once it has run out of available ones. */
-	if (FireRateMode == EFireRateMode::AvailabilityBased)
+	if (ProjectileLauncher)
 	{
-		ProjectileLauncher->GetPoolComponent()->SetShouldCreateNew(false);
+		PlayerProjectileLauncher = Cast<APlayerProjectileLauncher>(ProjectileLauncher);
+		if (!PlayerProjectileLauncher)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Player projectile launcher not found."));
+		}
 	}
 }
 
