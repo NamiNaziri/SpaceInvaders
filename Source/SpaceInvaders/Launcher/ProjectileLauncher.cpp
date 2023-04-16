@@ -2,11 +2,11 @@
 
 
 #include "ProjectileLauncher.h"
-
 #include "GameFramework/ProjectileMovementComponent.h"
 
-#include "../ObjectPool/ObjectPoolComponent.h"
-#include "../Enemy/ProjectileBaseActor.h"
+#include "SpaceInvaders/ObjectPool/ObjectPoolComponent.h"
+#include "SpaceInvaders/Enemy/ProjectileBaseActor.h"
+
 // Sets default values
 AProjectileLauncher::AProjectileLauncher(const FObjectInitializer& ObjectInitializer)
 {
@@ -14,8 +14,6 @@ AProjectileLauncher::AProjectileLauncher(const FObjectInitializer& ObjectInitial
 	PrimaryActorTick.bCanEverTick = true;
 
 	PoolComponent = CreateDefaultSubobject<UObjectPoolComponent>(TEXT("Object Pool"));
-
-
 }
 
 // Called when the game starts or when spawned
@@ -29,7 +27,6 @@ void AProjectileLauncher::BeginPlay()
 void AProjectileLauncher::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 bool AProjectileLauncher::Launch(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed)

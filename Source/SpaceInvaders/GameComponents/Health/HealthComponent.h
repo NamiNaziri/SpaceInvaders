@@ -33,16 +33,16 @@ public:
 
 	// Decrease the health of the character by a specified amount
 	UFUNCTION(BlueprintCallable)
-	void DecreaseHealth(float Damage);
+		void DecreaseHealth(float Damage);
 
 	UFUNCTION(BlueprintCallable)
-	float GetMaxHealth();
+		float GetMaxHealth();
 
 	UFUNCTION(BlueprintCallable)
-	float GetCurrentHealth();
+		float GetCurrentHealth();
 
 	UFUNCTION(BlueprintCallable)
-	void ResetHealth();
+		void ResetHealth();
 
 	FOnHealthBecomeZero OnHealthBecomeZero;
 

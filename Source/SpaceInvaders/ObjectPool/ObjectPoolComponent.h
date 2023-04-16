@@ -59,7 +59,6 @@ protected:
 	UPROPERTY()
 		TMap<TObjectPtr<AActor>, bool> PooledObjects;
 
-
 	UFUNCTION()
 		void SpawnObjects(int num);
 

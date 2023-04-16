@@ -14,7 +14,6 @@ void APlayerBaseState::SetMaxHealth(float NewMaxHealth)
 {
 	this->MaxHealth = NewMaxHealth;
 	OnMaxHealthChanged.Broadcast(NewMaxHealth);
-	//this->Health = NewMaxHealth;
 }
 
 float APlayerBaseState::GetMaxHealth()

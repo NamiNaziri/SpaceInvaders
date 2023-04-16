@@ -5,8 +5,6 @@
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
-
-
 void ACoreHUD::BeginPlay()
 {
 	Super::BeginPlay();

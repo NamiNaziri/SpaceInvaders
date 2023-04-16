@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Delegates/Delegate.h"
-#include "../Pawn/BasePawn.h"
+#include "SpaceInvaders/Pawn/BasePawn.h"
 #include "EnemyBasePawn.generated.h"
 
 

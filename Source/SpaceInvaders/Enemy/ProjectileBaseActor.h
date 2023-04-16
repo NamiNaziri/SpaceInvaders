@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "../ObjectPool/PoolableObjectInterface.h"
+#include "SpaceInvaders/ObjectPool/PoolableObjectInterface.h"
 #include "Delegates/Delegate.h"
 #include "ProjectileBaseActor.generated.h"
 

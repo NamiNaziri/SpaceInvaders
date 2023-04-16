@@ -2,12 +2,13 @@
 
 
 #include "CoreGameMode.h"
-#include "SpaceInvaders/Enemy/EnemySpawner.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+
+#include "SpaceInvaders/Enemy/EnemySpawner.h"
 #include "SpaceInvaders/Player/PlayerBaseController.h"
 #include "SpaceInvaders/Game/CoreHUD.h"
 #include "SpaceInvaders/Game/SpawnLocationActor.h"
-#include "Components/AudioComponent.h"
 #include "SpaceInvaders/Enemy/EnemyBasePawn.h"
 
 ACoreGameMode::ACoreGameMode()

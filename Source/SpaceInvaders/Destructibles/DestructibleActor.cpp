@@ -5,10 +5,10 @@
 #include "GeometryCollection/GeometryCollectionComponent.h"
 #include "Delegates/Delegate.h"
 #include "Field/FieldSystemActor.h"
-#include <Components/BoxComponent.h>
+#include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "SpaceInvaders/GameComponents/Health/HealthComponent.h"
-#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ADestructibleActor::ADestructibleActor()

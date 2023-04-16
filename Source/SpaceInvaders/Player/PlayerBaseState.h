@@ -31,18 +31,18 @@ public:
 	void SetMaxHealth(float NewMaxHealth);
 
 	UFUNCTION(BlueprintCallable)
-	float GetMaxHealth();
+		float GetMaxHealth();
 
 	void SetHealth(float NewHealth);
 
 	UPROPERTY(BlueprintAssignable)
-	FOnHelthChanged OnHealthChanged;
+		FOnHelthChanged OnHealthChanged;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnScoreChanged OnScoreChanged;
+		FOnScoreChanged OnScoreChanged;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnMaxHealthChanged OnMaxHealthChanged;
+		FOnMaxHealthChanged OnMaxHealthChanged;
 protected:
 
 	float Health = 3;

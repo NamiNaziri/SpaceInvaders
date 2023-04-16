@@ -2,12 +2,13 @@
 
 
 #include "EnemySpawner.h"
-#include <Components/BoxComponent.h>
+#include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "EnemyBasePawn.h"
-#include "../Launcher/ProjectileLauncher.h"
-#include "../Game/CoreGameState.h"
-#include "../Game/CoreGameMode.h"
+
+#include "SpaceInvaders/Launcher/ProjectileLauncher.h"
+#include "SpaceInvaders/Game/CoreGameState.h"
+#include "SpaceInvaders/Game/CoreGameMode.h"
 
 // Sets default values
 AEnemySpawner::AEnemySpawner()

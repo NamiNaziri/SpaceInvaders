@@ -7,16 +7,15 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/GameEngine.h"
-
-#include <Components/BoxComponent.h>
+#include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include <GameFramework/PawnMovementComponent.h>
-#include <GameFramework/FloatingPawnMovement.h>
+#include "GameFramework/PawnMovementComponent.h"
+#include "GameFramework/FloatingPawnMovement.h"
 
-#include "../Enemy/ProjectileBaseActor.h"
-#include "../Launcher/ProjectileLauncher.h"
-#include "../ObjectPool/ObjectPoolComponent.h"
-#include "../GameComponents/Health/HealthComponent.h"
+#include "SpaceInvaders/Enemy/ProjectileBaseActor.h"
+#include "SpaceInvaders/Launcher/ProjectileLauncher.h"
+#include "SpaceInvaders/ObjectPool/ObjectPoolComponent.h"
+#include "SpaceInvaders/GameComponents/Health/HealthComponent.h"
 #include "PlayerBaseController.h"
 #include "SpaceInvaders/Launcher/PlayerProjectileLauncher.h"
 
@@ -27,16 +26,12 @@ APlayerBasePawn::APlayerBasePawn()
 
 	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>(TEXT("Pawn Movement"));
 	MovementComponent->UpdatedComponent = BoxComponent;
-
-
-
 }
 
 // Called when the game starts or when spawned
 void APlayerBasePawn::BeginPlay()
 {
 	Super::BeginPlay();
-
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -46,18 +41,14 @@ void APlayerBasePawn::BeginPlay()
 		}
 	}
 
-
-
 	APlayerBaseController* PBC = GetController<APlayerBaseController>();
 	PBC->SetMaxHealth(HealthComponent->GetMaxHealth());
-
 }
 
 // Called every frame
 void APlayerBasePawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -84,7 +75,6 @@ void APlayerBasePawn::TakePointDamage(AActor* DamagedActor, float Damage, AContr
 	{
 		PBC->SetHealth(HealthComponent->GetCurrentHealth());
 	}
-	
 
 	if (ImpactSoundCue)
 	{
@@ -102,16 +92,13 @@ void APlayerBasePawn::HealthBecomeZero(AActor* OwnerActor)
 	{
 		PBC->RecieveOnDeath();
 	}
-	
 }
 
 void APlayerBasePawn::Move(const FInputActionInstance& Instance)
 {
-
 	FVector2D MoveInput = Instance.GetValue().Get<FVector2D>();
 
 	AddMovementInput(GetActorRightVector(), -1 * MoveInput.X * MovementSpeed);
-
 }
 
 void APlayerBasePawn::Shoot(const FInputActionInstance& Instance)

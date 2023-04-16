@@ -9,7 +9,6 @@
 APlayerProjectileLauncher::APlayerProjectileLauncher(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	//Super()
 	bCanShoot = true;
 
 	/* When using a projectile-based firing rate, the object pool should not create new objects once it has run out of available ones. */

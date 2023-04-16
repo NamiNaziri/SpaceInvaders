@@ -11,7 +11,6 @@ class AProjectileBaseActor;
 class AProjectileLauncher;
 class UHealthComponent;
 
-
 /*
 *	Base class for player and enemiy pawn. 
 *	It contains simple mesh with a box collider and health and projectile component.
@@ -55,7 +54,7 @@ protected:
 		TObjectPtr<AProjectileLauncher> ProjectileLauncher;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Health")
-	TObjectPtr<UHealthComponent> HealthComponent;
+		TObjectPtr<UHealthComponent> HealthComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Visual|Particle")
 		TObjectPtr<UParticleSystem> ExplosionParticleSystem;
@@ -69,13 +68,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Visual|Animation")
 		float MeshRotationRate = 3.f;
 
-
 	UPROPERTY()
 		FVector PrevLocation;
 
-
 	UPROPERTY()
 		float InitMeshYaw;
+
 
 	UFUNCTION()
 		virtual void TakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);

@@ -3,9 +3,9 @@
 
 #include "CoreGameInstance.h"
 #include "Kismet/GameplayStatics.h"
-#include "CoreSaveGame.h"
 #include "Algo/BinarySearch.h"
 
+#include "CoreSaveGame.h"
 
 void UCoreGameInstance::Init()
 {

@@ -2,16 +2,17 @@
 
 
 #include "EnemyBasePawn.h"
-#include <Components/BoxComponent.h>
+#include "Components/BoxComponent.h"
 #include "Engine/DamageEvents.h"
 #include "ProjectileBaseActor.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "SpaceInvaders/GameComponents/Health/HealthComponent.h"	
 #include "SpaceInvaders/Launcher/ProjectileLauncher.h"
 #include "SpaceInvaders/Player/PlayerBaseController.h"
 #include "SpaceInvaders/Game/CoreGameState.h"
-#include <SpaceInvaders/Destructibles/DestructibleActor.h>
+#include "SpaceInvaders/Destructibles/DestructibleActor.h"
 
-#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyBasePawn::AEnemyBasePawn()

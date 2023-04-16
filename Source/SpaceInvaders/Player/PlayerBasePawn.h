@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "../Pawn/BasePawn.h"
+#include "SpaceInvaders/Pawn/BasePawn.h"
 #include "PlayerBasePawn.generated.h"
 
 class UInputMappingContext;
@@ -32,7 +32,6 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Player|Sound Cue")

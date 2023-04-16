@@ -7,9 +7,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "CoreGameState.generated.h"
 
-
-
-
 /**
  *  This class oversees the progression of each level, which is a relatively straightforward process. 
  *	The number of enemies remaining in a level serves as a key determining factor for advancement to the next stage.

@@ -9,7 +9,6 @@
 class UObjectPoolComponent;
 class AProjectileBaseActor;
 
-
 /*
 *	This class has a pool of projectile base actors and can launch a projectile.
 *	This is a base class for projectile luncher that can only lunch a single projectile.
@@ -27,8 +26,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	//virtual void 
 
 public:	
 	// Called every frame
