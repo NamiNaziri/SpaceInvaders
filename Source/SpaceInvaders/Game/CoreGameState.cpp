@@ -3,25 +3,20 @@
 
 #include "CoreGameState.h"
 #include "CoreGameMode.h"
-EGameProgressionState ACoreGameState::GetCurrentState()
-{
-    UpdateGameState();
-    return CurrentState;
-}
 
 void ACoreGameState::EnemyDestroyed()
 {
-    this->EnemiesLeft -= 1;
-    UE_LOG(LogTemp, Warning, TEXT("Left Enemies: %d"), EnemiesLeft);
-    if (EnemiesLeft == 0)
+    this->RemainingEnemies -= 1;
+    UE_LOG(LogTemp, Warning, TEXT("Left Enemies: %d"), RemainingEnemies);
+    if (RemainingEnemies == 0)
     {
         AdvanceLevel();
     }
 }
 
-void ACoreGameState::InitEnemiesLeft(float MaxEnemies)
+void ACoreGameState::InitRemainingEnemiesCount(float MaxEnemies)
 {
-    this->EnemiesLeft = MaxEnemies;
+    this->RemainingEnemies = MaxEnemies;
 }
 
 void ACoreGameState::AdvanceLevel()
@@ -31,8 +26,4 @@ void ACoreGameState::AdvanceLevel()
     ACoreGameMode* GameMode = Cast<ACoreGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
     GameMode->AdvanceLevel();
 
-}
-
-void ACoreGameState::UpdateGameState()
-{
 }

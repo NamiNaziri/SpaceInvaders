@@ -29,5 +29,9 @@ class SPACEINVADERS_API IPoolableObjectInterface
 
 
 public:
+	/*
+	*	Every poolable objects should implmenet this function.
+	*	The pool binds to this delegate. When the pooled object completes its task and needs to be returned to the pool, it can call this delegate to do so.
+	*/
 	virtual FOnPoolableObjectReleaseDelegate& GetPoolableObjectReleaseDelegate() = 0;
 };

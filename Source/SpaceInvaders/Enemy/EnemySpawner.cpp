@@ -378,7 +378,7 @@ void AEnemySpawner::InitializeSpawner()
 	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
 	if (bShouldRegisterToGameState && IsValid(GBS))
 	{
-		GBS->InitEnemiesLeft(RemainingEnemyCount);
+		GBS->InitRemainingEnemiesCount(RemainingEnemyCount);
 	}
 
 }
@@ -492,7 +492,7 @@ void AEnemySpawner::ResetSpawner(int Level)
 	ACoreGameState* GBS = Cast<ACoreGameState>(GetWorld()->GetGameState());
 	if (bShouldRegisterToGameState && IsValid(GBS))
 	{
-		GBS->InitEnemiesLeft(RemainingEnemyCount);
+		GBS->InitRemainingEnemiesCount(RemainingEnemyCount);
 	}
 	
 	for (auto& Enemy : Enemies)

@@ -32,8 +32,8 @@ public:
 	{}
 };
 
-/**
- * 
+/*
+ * Game Instance manages the leaderboard and saving data between sessions by using the CoreSaveGame class. 
  */
 UCLASS()
 class SPACEINVADERS_API UCoreGameInstance : public UGameInstance
@@ -44,10 +44,7 @@ public:
 
 	virtual void Init() override;
 
-
-
 	void InitSaveFile();
-
 
 	UFUNCTION(BlueprintCallable)
 	void AddToLeaderboard(FString PlayerName, float Score);

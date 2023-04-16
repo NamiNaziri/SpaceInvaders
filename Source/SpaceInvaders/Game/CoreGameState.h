@@ -7,17 +7,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "CoreGameState.generated.h"
 
-UENUM(BlueprintType)
-enum EGameProgressionState
-{
-	NotStarted UMETA(DisplayName = "Right"),
-	InProgress UMETA(DisplayName = "Left"),
-	Finished UMETA(DisplayName = "Down")
-};
+
 
 
 /**
- * 
+ *  This class oversees the progression of each level, which is a relatively straightforward process. 
+ *	The number of enemies remaining in a level serves as a key determining factor for advancement to the next stage.
  */
 UCLASS()
 class SPACEINVADERS_API ACoreGameState : public AGameStateBase
@@ -25,10 +20,14 @@ class SPACEINVADERS_API ACoreGameState : public AGameStateBase
 	GENERATED_BODY()
 	
 public:
-	EGameProgressionState GetCurrentState();
 
+	UFUNCTION(BlueprintCallable)
 	void EnemyDestroyed();
-	void InitEnemiesLeft(float MaxEnemies);
+
+	UFUNCTION(BlueprintCallable)
+	void InitRemainingEnemiesCount(float MaxEnemies);
+
+	UFUNCTION(BlueprintCallable)
 	void AdvanceLevel();
 
 
@@ -36,9 +35,5 @@ protected:
 
 
 	UPROPERTY()
-		int EnemiesLeft = 0;
-
-	TEnumAsByte<EGameProgressionState> CurrentState;
-
-	void UpdateGameState();
+		int RemainingEnemies = 0;
 };

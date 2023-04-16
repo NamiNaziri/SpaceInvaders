@@ -8,8 +8,8 @@
 
 class UUserWidget;
 
-/**
- * 
+/*
+ * The class is designed to centralize the management of widgets. Other classes can call different functionality from this class.
  */
 UCLASS()
 class SPACEINVADERS_API ACoreHUD : public AHUD

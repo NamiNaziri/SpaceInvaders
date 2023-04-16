@@ -12,6 +12,7 @@ class AProjectileBaseActor;
 
 /*
 *	This class has a pool of projectile base actors and can launch a projectile.
+*	This is a base class for projectile luncher that can only lunch a single projectile.
 */
 
 UCLASS()
@@ -33,10 +34,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Negative Speed uses the speed defined in the projectile component
+	/*
+	*	Gets a single projectile from the pool and launches toward the give direction
+	*	Negative Speed uses the speed defined in the projectile component
+	*/
 	bool Launch(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed = -1.f);
 
-		TObjectPtr<UObjectPoolComponent> GetPoolComponent();
+	TObjectPtr<UObjectPoolComponent> GetPoolComponent();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

@@ -11,7 +11,9 @@
 UDELEGATE()
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthBecomeZero, AActor*, OwnerActor);
 
-
+/*
+*	Simple health component that can manage health of different actors.	
+*/
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEINVADERS_API UHealthComponent : public UActorComponent
 {
@@ -30,11 +32,16 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// Decrease the health of the character by a specified amount
+	UFUNCTION(BlueprintCallable)
 	void DecreaseHealth(float Damage);
 
+	UFUNCTION(BlueprintCallable)
 	float GetMaxHealth();
+
+	UFUNCTION(BlueprintCallable)
 	float GetCurrentHealth();
 
+	UFUNCTION(BlueprintCallable)
 	void ResetHealth();
 
 	FOnHealthBecomeZero OnHealthBecomeZero;

@@ -109,8 +109,8 @@ TObjectPtr<AActor> UObjectPoolComponent::SpawnSingleObject()
 		SpawnedObject->SetActorTickEnabled(false);
 		SpawnedObject->SetActorHiddenInGame(true);
 		SpawnedObject->SetActorEnableCollision(false);
-		//SpawnedObject->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
-
+		
+		
 		IPoolableObjectInterface* PoolableObjectInterface = Cast<IPoolableObjectInterface>(SpawnedObject);
 		if (PoolableObjectInterface)
 		{

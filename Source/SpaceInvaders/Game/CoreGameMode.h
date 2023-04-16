@@ -19,8 +19,8 @@ UDELEGATE()
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelAdvanced, int, Level);
 
 
-/**
- * 
+/*
+ * This class oversees the progression of the game.
  */
 UCLASS()
 class SPACEINVADERS_API ACoreGameMode : public AGameModeBase
@@ -38,19 +38,15 @@ public:
 	UPROPERTY(BlueprintAssignable)
 		FOnRemainingTimeUpdated OnRemainingTimeUpdated;
 
-
 	UPROPERTY(BlueprintAssignable)
 		FOnLevelAdvanced OnLevelAdvanced;
 
 	virtual void PostLogin(APlayerController* NewPlayer);
 
-
 	UFUNCTION(BlueprintCallable)
 		void PlayerDied();
 
-
 protected: 
-
 
 	UPROPERTY()
 		int Level = 1;
@@ -67,20 +63,13 @@ protected:
 	UPROPERTY()
 		FTimerHandle TimerHandle_UFOCollisionDisable;
 
-	// New level countdown(seconds)
+	/* New level countdown(seconds) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|Flow")
 		int NewLevelCountdown = 3.f;
 
-	/* Destroy UFO after a duration of UFOLifeSpan seconds has elapsed since it is spawned.*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|UFO")
-		float UFOLifeSpan = 3.f;
 
-	/** allows adding random time to UFO Life Span */
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Level|UFO")
-		float UFOLifeSpanRandomDeviation = 0.f;
-	
-	/*	Spawn new ufo every UFOSpawnInterval seconds. 
-	*	Note that at the end, each ufo will be spawned after around UFOSpawnInterval + UFOLifeSpan seconds 
+	/*	Spawn new ufo every UFOSpawnInterval seconds.
+	*	Note that at the end, each ufo will be spawned after around UFOSpawnInterval + UFOLifeSpan seconds
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|UFO")
 		float UFOSpawnInterval = 5.f;
@@ -89,6 +78,13 @@ protected:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Level|UFO")
 		float UFOSpawnRandomDeviation = 0.f;
 
+	/* Destroy UFO after a duration of UFOLifeSpan seconds has elapsed since it is spawned.*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|UFO")
+		float UFOLifeSpan = 3.f;
+
+	/* allows adding random time to UFO Life Span */
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Level|UFO")
+		float UFOLifeSpanRandomDeviation = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|UFO")
 		float UFOColisionDisableDelay = 1.f;
@@ -100,18 +96,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|Sound Cue")
 		TObjectPtr<USoundBase> GameOverSoundCue;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|Spawn")
+		TSubclassOf<AEnemySpawner> UFOSpawnerClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|Spawn")
+		TSubclassOf<AEnemySpawner> EnemySpawnerClass;
+
+
 	UPROPERTY()
 		TObjectPtr<UAudioComponent> UFOAudioComponent;
 
 	UPROPERTY()
 		TObjectPtr<ASpawnLocationActor> SpawnLocationActor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|Spawn")
-		TSubclassOf<AEnemySpawner>   UFOSpawnerClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Level|Spawn")
-		TSubclassOf<AEnemySpawner> EnemySpawnerClass;
-
 
 	UPROPERTY()
 		TObjectPtr<AEnemySpawner> UFOSpawner;
@@ -119,6 +116,7 @@ protected:
 	UPROPERTY()
 		TObjectPtr<AEnemyBasePawn> UFOPawn;
 
+	
 	UPROPERTY()
 		float RemainingTime;
 
@@ -132,9 +130,6 @@ protected:
 
 	UPROPERTY()
 		TObjectPtr <ACoreHUD> CoreHUD;
-
-
-
 
 	UFUNCTION()
 		void StartNewLevel();
