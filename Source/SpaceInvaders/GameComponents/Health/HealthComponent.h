@@ -48,11 +48,11 @@ public:
 
 	
 protected:
-	// The current health of the character
+	// The current health of the actor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 		float CurrentHealth = 1.f;
 
-	// The maximum health of the character
+	// The maximum health of the actor
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
 		float MaxHealth = 1.f;
 	
