@@ -6,7 +6,7 @@
 #include "Delegates/Delegate.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "SpaceInvaders/Enemy/ProjectileBaseActor.h"
+#include "SpaceInvaders/Launcher/ProjectileBaseActor.h"
 #include "SpaceInvaders/Launcher/ProjectileLauncher.h"
 #include "SpaceInvaders/GameComponents/Health/HealthComponent.h"
 

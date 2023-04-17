@@ -4,33 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "SpaceInvaders/Library/PlayerInfoLibrary.h"
 #include "CoreGameInstance.generated.h"
 
 // saving functionality is adopted from this toturial: https://www.youtube.com/watch?v=UsHuonij43o
 
 class UCoreSaveGame;
 class USaveGame;
-
-USTRUCT(BlueprintType)
-struct FLeaderboardInfo
-{
-	GENERATED_BODY()
-
-public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardInfo")
-		FString PlayerName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardInfo")
-		float Score;
-
-	FLeaderboardInfo() {}
-
-	FLeaderboardInfo(FString PlayerName, float Score) :
-		PlayerName(PlayerName),
-		Score(Score)
-	{}
-};
 
 /*
  * Game Instance manages the leaderboard and saving data between sessions by using the CoreSaveGame class. 

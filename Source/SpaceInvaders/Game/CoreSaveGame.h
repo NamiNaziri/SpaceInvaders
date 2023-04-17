@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
-#include "CoreGameInstance.h" // this should be removed
+#include "SpaceInvaders/Library/PlayerInfoLibrary.h"
 #include "CoreSaveGame.generated.h"
 
 /**

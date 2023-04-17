@@ -13,7 +13,6 @@ class AProjectileBaseActor;
 *	This class has a pool of projectile base actors and can launch a projectile.
 *	This is a base class for projectile luncher that can only lunch a single projectile.
 */
-
 UCLASS()
 class SPACEINVADERS_API AProjectileLauncher : public AActor
 {

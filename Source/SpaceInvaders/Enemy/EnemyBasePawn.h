@@ -16,8 +16,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyDestroyed, AEnemyBasePawn*, 
 *	Base class for enemies. 
 *	They are called enemy and not AI, because on their own they do nothing. The Enemy Spawner manages the enemies.
 */
-
-
 UCLASS()
 class SPACEINVADERS_API AEnemyBasePawn : public ABasePawn
 {

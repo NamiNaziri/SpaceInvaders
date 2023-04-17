@@ -2,15 +2,15 @@
 
 
 #include "PlayerBaseController.h"
-#include "PlayerBaseState.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "SpaceInvaders/Game/CoreGameMode.h"
 #include "SpaceInvaders/Game/CoreHUD.h"
+#include "SpaceInvaders/Game/CorePlayerState.h"
 
 void APlayerBaseController::AddScore(float ScoreToAdd)
 {
-	APlayerBaseState* PS = GetPlayerState<APlayerBaseState>();
+	ACorePlayerState* PS = GetPlayerState<ACorePlayerState>();
 	if (PS)
 	{
 		PS->AddScore(ScoreToAdd);
@@ -19,7 +19,7 @@ void APlayerBaseController::AddScore(float ScoreToAdd)
 
 void APlayerBaseController::SetHealth(float Health)
 {
-	APlayerBaseState* PS = GetPlayerState<APlayerBaseState>();
+	ACorePlayerState* PS = GetPlayerState<ACorePlayerState>();
 	if (PS)
 	{
 		PS->SetHealth(Health);
@@ -28,7 +28,7 @@ void APlayerBaseController::SetHealth(float Health)
 
 void APlayerBaseController::SetMaxHealth(float MaxHealth)
 {
-	APlayerBaseState* PS = GetPlayerState<APlayerBaseState>();
+	ACorePlayerState* PS = GetPlayerState<ACorePlayerState>();
 	if (PS)
 	{
 		PS->SetMaxHealth(MaxHealth);

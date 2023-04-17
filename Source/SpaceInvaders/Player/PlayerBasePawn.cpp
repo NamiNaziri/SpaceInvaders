@@ -12,12 +12,12 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 
-#include "SpaceInvaders/Enemy/ProjectileBaseActor.h"
+#include "SpaceInvaders/Launcher/ProjectileBaseActor.h"
 #include "SpaceInvaders/Launcher/ProjectileLauncher.h"
 #include "SpaceInvaders/ObjectPool/ObjectPoolComponent.h"
 #include "SpaceInvaders/GameComponents/Health/HealthComponent.h"
-#include "PlayerBaseController.h"
 #include "SpaceInvaders/Launcher/PlayerProjectileLauncher.h"
+#include "PlayerBaseController.h"
 
 // Sets default values
 APlayerBasePawn::APlayerBasePawn()

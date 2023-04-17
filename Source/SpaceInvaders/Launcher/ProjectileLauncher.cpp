@@ -5,7 +5,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 
 #include "SpaceInvaders/ObjectPool/ObjectPoolComponent.h"
-#include "SpaceInvaders/Enemy/ProjectileBaseActor.h"
+#include "SpaceInvaders/Launcher/ProjectileBaseActor.h"
 
 // Sets default values
 AProjectileLauncher::AProjectileLauncher(const FObjectInitializer& ObjectInitializer)
