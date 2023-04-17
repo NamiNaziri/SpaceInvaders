@@ -2,6 +2,8 @@
 
 This is a space invaders clone game made using the Unreal engine as an entry for the **'Games Job Fair Spring 2023 - Unreal Engine Programming Challenge'**.
 
+
+**Try the game from [here](https://naminaziri.itch.io/space-invaders)**
 ## Keyboard shortcuts
 
 Move -> "A/D"
