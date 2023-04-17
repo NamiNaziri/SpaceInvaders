@@ -170,10 +170,10 @@ protected:
 	FTimerHandle TimerHandle_FireAtPlayer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UBoxComponent> LeftBoxComponent;
+		TObjectPtr<UBoxComponent> LeftBoxComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UBoxComponent> RightBoxComponent;
+		TObjectPtr<UBoxComponent> RightBoxComponent;
 
 	/* Current Direction of the movement (we need it when we want to know what direction we should move next.)*/
 	float Direction = 1.f;

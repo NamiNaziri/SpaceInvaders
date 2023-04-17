@@ -19,13 +19,13 @@ class SPACEINVADERS_API ACoreGameState : public AGameStateBase
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void EnemyDestroyed();
+		void EnemyDestroyed();
 
 	UFUNCTION(BlueprintCallable)
-	void InitRemainingEnemiesCount(float MaxEnemies);
+		void InitRemainingEnemiesCount(float MaxEnemies);
 
 	UFUNCTION(BlueprintCallable)
-	void AdvanceLevel();
+		void AdvanceLevel();
 
 protected:
 

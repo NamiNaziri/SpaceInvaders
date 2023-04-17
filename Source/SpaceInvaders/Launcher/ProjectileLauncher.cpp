@@ -11,7 +11,7 @@
 AProjectileLauncher::AProjectileLauncher(const FObjectInitializer& ObjectInitializer)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	PoolComponent = CreateDefaultSubobject<UObjectPoolComponent>(TEXT("Object Pool"));
 }
