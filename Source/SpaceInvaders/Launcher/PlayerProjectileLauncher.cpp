@@ -10,6 +10,11 @@ APlayerProjectileLauncher::APlayerProjectileLauncher(const FObjectInitializer& O
 	: Super(ObjectInitializer)
 {
 	bCanShoot = true;
+}
+
+void APlayerProjectileLauncher::BeginPlay()
+{
+	Super::BeginPlay();
 
 	/* When using a projectile-based firing rate, the object pool should not create new objects once it has run out of available ones. */
 	if (FireRateMode == EFireRateMode::AvailabilityBased)
@@ -18,10 +23,13 @@ APlayerProjectileLauncher::APlayerProjectileLauncher(const FObjectInitializer& O
 	}
 }
 
+
 void APlayerProjectileLauncher::CanShoot()
 {
 	bCanShoot = true;
 	GetWorldTimerManager().ClearTimer(TimerHandle_CanShoot);
+
+
 }
 
 void APlayerProjectileLauncher::Shoot(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed)
@@ -48,3 +56,4 @@ void APlayerProjectileLauncher::Shoot(FVector Location, FRotator Rotation, FVect
 		}
 	}
 }
+

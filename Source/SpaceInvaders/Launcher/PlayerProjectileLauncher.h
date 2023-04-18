@@ -20,6 +20,10 @@ public:
 	virtual void Shoot(FVector Location, FRotator Rotation, FVector LaunchDirection, float Speed = -1.f);
 
 protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Launcher|Shooting")
 		TEnumAsByte<EFireRateMode> FireRateMode = EFireRateMode::AvailabilityBased;
 
