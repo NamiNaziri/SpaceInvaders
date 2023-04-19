@@ -4,6 +4,14 @@ This is a space invaders clone game made using the Unreal engine as an entry for
 
 
 **Try the game from [here](https://naminaziri.itch.io/space-invaders)**
+
+---
+
+https://user-images.githubusercontent.com/49837425/233211798-72b8cdff-dfeb-486b-a738-c119d4b6bb3d.mp4
+
+
+
+
 ## Keyboard shortcuts
 
 Move -> "A/D"
