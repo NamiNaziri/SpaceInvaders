@@ -36,10 +36,11 @@ Shoot ->"Left Click / Spacebar"
 
 [Licence: CC Attribution](https://creativecommons.org/licenses/by/4.0/)
 
-#### Jupiter class Battleship
+#### SpaceShip "Carelia"
 
-[Link to sketchfab](https://sketchfab.com/3d-models/jupiter-class-battleship-67a68fab4a144293867ef94364400076)
+[Link to sketchfab](https://sketchfab.com/3d-models/spaceship-carelia-9f0b7bb00d6241ac80e772b79d6cecce)
 
+[Licence: CC Attribution](https://creativecommons.org/licenses/by/4.0/)
 
 #### Sci-Fi Personal Space Pod Ship
 
