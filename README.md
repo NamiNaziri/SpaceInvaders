@@ -2,6 +2,9 @@
 
 This is a space invaders clone game made using the Unreal engine as an entry for the **'Games Job Fair Spring 2023 - Unreal Engine Programming Challenge'**.
 
+**This entry has been selected as one of the top 3 entries, and the code structure is reviewed by Chris Rock, the Lead Gameplay Programmer at Savage Games. You can watch the review from this [link](https://youtu.be/u3x7nDlHT6s?t=2168)**
+
+
 
 **Try the game from [here](https://naminaziri.itch.io/space-invaders)**
 
